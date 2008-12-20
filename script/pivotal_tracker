@@ -273,7 +273,7 @@ sub _display_story($story; $options)
     $options->{'show_notes'} ||= 0;
 
     my $story_text =
-          sprintf("Story %s < %s >:\n", $story->{'id'}, $story->{'url'})
+          sprintf("Story %s (%s) < %s >:\n", $story->{'id'}, $story->{'story_type'}, $story->{'url'})
         . sprintf("           Name: %s\n", $story->{'name'})
         . sprintf("       Estimate: %s\n", $story->{'estimate'})
         . sprintf("          State: %s\n", $story->{'current_state'});
