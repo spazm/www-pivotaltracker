@@ -252,12 +252,17 @@ sub _display_story($story)
           sprintf("Story %s < %s >:\n", $story->{'id'}, $story->{'url'})
         . sprintf("           Name: %s\n", $story->{'name'})
         . sprintf("       Estimate: %s\n", $story->{'estimate'})
-        . sprintf("          State: %s\n", $story->{'current_state'})
-        . sprintf("    Description: %s\n", $story->{'description'})
-        . sprintf("   Requested By: %s\n", $story->{'requested_by'})
-        . sprintf("        Created: %s\n", $story->{'created_at'})
-        . sprintf("       Label(s): %s\n", join(", ", @{$story->{'labels'}}))
-        . "\n";
+        . sprintf("          State: %s\n", $story->{'current_state'});
+    $story_text .=
+          sprintf("    Description: %s\n", $story->{'description'})
+            if defined $story->{'description'};
+    $story_text .=
+          sprintf("   Requested By: %s\n", $story->{'requested_by'})
+        . sprintf("        Created: %s\n", $story->{'created_at'});
+    $story_text .=
+          sprintf("       Label(s): %s\n", join(", ", @{$story->{'labels'}}))
+            if defined $story->{'labels'};
+    $story_text .= "\n";
 
     print $story_text;
 }
@@ -311,7 +316,7 @@ sub _main()
             project_id    => $project_id,
             name          => $opts->{'story'},
             requested_by  => ($opts->{'requested_by'} || $cfg->{'General'}->{'Me'}),
-            labels        => join(",", @{$opts->{'label'}}),
+            labels        => (exists $opts->{'label'} ? join(",", @{$opts->{'label'}}) : undef),
             estimate      => $opts->{'estimate'},
             created_at    => $opts->{'created_at'},
             story_type    => $opts->{'story_type'},
