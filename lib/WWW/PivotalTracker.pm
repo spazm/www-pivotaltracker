@@ -54,6 +54,7 @@ our @EXPORT_OK = qw/
     add_story
     delete_story
     project_details
+    show_story
 /;
 
 =head1 FUNCTIONS
@@ -69,7 +70,7 @@ sub project_details($token, $project_id) {
     my $response = __PACKAGE__->_do_request($token, "projects/$project_id", "GET");
 
 
-    if (!defined $response || $response->{'success'} ne 'true') {
+    if (!defined $response || lc $response->{'success'} ne 'true') {
         return {
             success => 'false',
             errors  => (defined $response && exists $response->{'errors'} ? $response->{'errors'} : 'Epic fail!'),
@@ -82,6 +83,40 @@ sub project_details($token, $project_id) {
         name            => $response->{'project'}->{'name'},
         point_scale     => $response->{'project'}->{'point_scale'},
         start_day       => $response->{'project'}->{'week_start_day'},
+    };
+}
+
+=head2 show_story
+
+=cut
+
+sub show_story($token, $project_id, $story_id)
+{
+    croak("Malformed Project ID: '$project_id'") unless __PACKAGE__->_check_project_id($project_id);
+    croak("Malformed Story ID: '$story_id'") unless __PACKAGE__->_check_story_id($story_id);
+
+    my $response = __PACKAGE__->_do_request($token, "projects/$project_id/stories/$story_id", "GET");
+
+    if (!defined $response || lc $response->{'success'} ne 'true') {
+        return {
+            success => 'false',
+            errors  => (defined $response && exists $response->{'errors'} ? $response->{'errors'} : 'Epic fail!'),
+        };
+    }
+
+    my $story = $response->{'story'}->[0];
+    return {
+        success       => 'true',
+        id            => $story->{'id'}->{'content'},
+        name          => $story->{'name'},
+        description   => $story->{'description'},
+        estimate      => $story->{'estimate'}->{'content'},
+        current_state => $story->{'current_state'},
+        created_at    => $story->{'created_at'},
+        story_type    => $story->{'story_type'},
+        requested_by  => $story->{'requested_by'},
+        labels        => (exists $story->{'labels'} ? $story->{'labels'}->{'label'} : undef),
+        url           => $story->{'url'},
     };
 }
 
@@ -140,7 +175,7 @@ sub add_story($token, $project_id, $story_details)
 sub delete_story($token, $project_id, $story_id)
 {
     croak("Malformed Project ID: '$project_id'") unless __PACKAGE__->_check_project_id($project_id);
-    croak("Malformed Project ID: '$project_id'") unless __PACKAGE__->_check_story_id($project_id);
+    croak("Malformed Story ID: '$story_id'") unless __PACKAGE__->_check_story_id($story_id);
 
     my $response = __PACKAGE__->_do_request($token, "projects/$project_id/stories/$story_id", "DELETE");
 

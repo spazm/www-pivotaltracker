@@ -11,9 +11,10 @@ use Getopt::Long::Descriptive qw/ :all      /;
 use Hash::Merge               qw/ merge     /;
 use Pod::Usage                qw/ pod2usage /;
 use WWW::PivotalTracker qw/
-    project_details
     add_story
     delete_story
+    project_details
+    show_story
 /;
 
 use aliased 'Config::Any' => 'Config';
@@ -219,6 +220,11 @@ sub _get_project_details($project_id)
     return $response;
 }
 
+sub _get_story($project_id, $story_id)
+{
+    return show_story(_api_key(), $project_id, $story_id);
+}
+
 sub _create_story($story_opts)
 {
     my $project_id = delete $story_opts->{'project_id'};
@@ -240,8 +246,8 @@ sub _delete_story($story_opts)
 
 sub _display_error($result)
 {
-    print "Unable to process request:\n";
-    printf("  %s\n", $_) foreach $result->{'errors'};
+    print STDERR "Unable to process request:\n";
+    printf STDERR ("  %s\n", $_) foreach $result->{'errors'};
 }
 
 sub _display_project($project)
@@ -317,6 +323,22 @@ sub _main()
 
         if (_response_was_successful($result)) {
             _display_project($result);
+            exit 0;
+        }
+        else {
+            _display_error($result);
+            exit 1;
+        }
+    }
+    if (exists $opts->{'show_story'}) {
+        unless ($opts->{'story_id'}) {
+            print STDERR "Missing --story-id.\n";
+            exit 1;
+        }
+        my $result = _get_story($project_id, $opts->{'story_id'});
+
+        if (_response_was_successful($result)) {
+            _display_story($result);
             exit 0;
         }
         else {
