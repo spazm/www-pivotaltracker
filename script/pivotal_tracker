@@ -281,6 +281,19 @@ sub _display_story($story)
     $story_text .=
           sprintf("       Label(s): %s\n", join(", ", @{$story->{'labels'}}))
             if defined $story->{'labels'};
+
+    if (defined $story->{'notes'}) {
+        $story_text .= "          Notes:\n";
+
+        foreach my $note (@{$story->{'notes'}}) {
+            $story_text .= sprintf("            %s (%s):\n", $note->{'author'}, $note->{'date'});
+            foreach my $note_line (split("\n", $note->{'text'})) {
+                $story_text .= sprintf("                 %s\n", $note_line);
+            }
+            $story_text .= "\n";
+        }
+    }
+
     $story_text .= "\n";
 
     print $story_text;

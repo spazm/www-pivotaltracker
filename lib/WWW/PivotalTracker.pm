@@ -105,6 +105,20 @@ sub show_story($token, $project_id, $story_id)
     }
 
     my $story = $response->{'story'}->[0];
+
+    my $labels = undef;
+    my $notes = undef;
+
+    $labels = $story->{'labels'}->{'label'} if exists $story->{'labels'};
+    $notes = [
+        map +{
+            id     => $_->{'id'}->{'content'},
+            author => $_->{'author'},
+            date   => $_->{'date'},
+            text   => $_->{'text'},
+        }, @{$story->{'notes'}->{'note'}}
+    ] if exists $story->{'notes'};
+
     return {
         success       => 'true',
         id            => $story->{'id'}->{'content'},
@@ -115,7 +129,8 @@ sub show_story($token, $project_id, $story_id)
         created_at    => $story->{'created_at'},
         story_type    => $story->{'story_type'},
         requested_by  => $story->{'requested_by'},
-        labels        => (exists $story->{'labels'} ? $story->{'labels'}->{'label'} : undef),
+        labels        => $labels,
+        notes         => $notes,
         url           => $story->{'url'},
     };
 }
