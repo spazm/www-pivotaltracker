@@ -234,14 +234,9 @@ sub _create_story($story_opts)
     return $response;
 }
 
-sub _delete_story($story_opts)
+sub _delete_story($project_id, $story_id)
 {
-    my $project_id = delete $story_opts->{'project_id'};
-    my $story_id = delete $story_opts->{'story_id'};
-
-    my $response = delete_story(_api_key(), $project_id, $story_id);
-
-    return $response;
+    return delete_story(_api_key(), $project_id, $story_id);
 }
 
 sub _display_error($result)
@@ -381,10 +376,7 @@ sub _main()
         }
     }
     elsif (exists $opts->{'delete_story'}) {
-        my $result = _delete_story({
-            project_id => $project_id,
-            story_id   => $opts->{'story_id'},
-        });
+        my $result = _delete_story($project_id, $opts->{'story_id'});
 
         if (_response_was_successful($result)) {
             print $result->{'message'} . "\n";
