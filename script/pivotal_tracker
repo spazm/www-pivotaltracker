@@ -207,23 +207,26 @@ sub _named_projects_string()
     return $projects_text;
 }
 
+sub _api_key()
+{
+    return $cfg->{'General'}->{'APIKey'};
+}
+
 sub _create_story($story_opts)
 {
-    my $token = $cfg->{'General'}->{'APIKey'};
     my $project_id = delete $story_opts->{'project_id'};
 
-    my $response = add_story($token, $project_id, $story_opts);
+    my $response = add_story(_api_key(), $project_id, $story_opts);
 
     return $response;
 }
 
 sub _delete_story($story_opts)
 {
-    my $token = $cfg->{'General'}->{'APIKey'};
     my $project_id = delete $story_opts->{'project_id'};
     my $story_id = delete $story_opts->{'story_id'};
 
-    my $response = delete_story($token, $project_id, $story_id);
+    my $response = delete_story(_api_key(), $project_id, $story_id);
 
     return $response;
 }
