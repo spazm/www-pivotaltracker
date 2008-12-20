@@ -36,7 +36,10 @@ our $VERSION = '0.01';
 This module provides simple methods to interact with the Pivotal Tracker API.
 
     use WWW::PivotalTracker qw/
+        add_story
+        delete_story
         project_details
+        show_story
     /;
 
     my $details = project_details("API Token", "Project ID");
@@ -61,6 +64,15 @@ our @EXPORT_OK = qw/
 
 =head2 project_details
 
+Returns a hashref with the project's name, point scale, number of weeks per
+iteration, and which day of the week the iterations start on.
+
+    my $proj = project_details($token, $project_id);
+
+    print "Project name: $proj->{'name'}\n"
+        . "Point scale: $proj->{'point_scale'}\n"
+        . "Weeks per Iteration: $proj->{'iteration_weeks'}\n"
+        . "Iteration start day: $proj->{'start_day'}\n";
 
 =cut
 
@@ -87,6 +99,29 @@ sub project_details($token, $project_id) {
 }
 
 =head2 show_story
+
+Return a hashref with the details of a specific story.
+
+    my $story = show_story($token, $project_id, $story_id);
+
+    # If the story doesn't have a particular attribute, then the hash key's
+    # value will be undef. (Ex: description, deadline, labels, notes)
+    $story->{'id'}
+    $story->{'name'}
+    $story->{'description'} # Possibly multi-line string.
+    $story->{'estimate'}    # Possible values are results in point_scale
+                            # returned by project_details, and -1 if not
+                            # estimated, yet.
+    $story->{'current_state'}
+    $story->{'created_at'}
+    $story->{'deadline'}    # undef, unless story type is 'release'
+    $story->{'story_type'}  # 'feature', 'bug', 'chore', or 'release'
+    $story->{'labels'}      # [ 'foo', 'bar', 'baz', ]
+    $story->{'notes'}       # [
+                            #     { id => 1, author => 'alice', date => 'Dec 20, 2008', text => 'comment', },
+                            #     { id => 2, author => 'bob', date => 'Dec 20, 2008', text => 'commenting on your comment', },
+                            # ]
+    $story->{'url'}
 
 =cut
 
@@ -136,6 +171,41 @@ sub show_story($token, $project_id, $story_id)
 }
 
 =head2 add_story
+
+Create a new story, given a hashref of the story's details, and return a
+story hashref of the same format as B<show_story>.
+
+Possible story details hash keys are:
+    created_at
+    current_state
+    deadline
+    description
+    estimate
+    labels
+    name
+    requested_by
+    story_type
+
+The bare minimum to create a new story are "requested_by", and "name".  New
+stories will default to be "feature" stories, unless a "story_type"
+("feature", "bug", "chore", or "release") is specified.
+
+To add labels, include a comma separated list as the "labels" value.
+
+    my $story_details = {
+        requested_by => "Bob",
+        name         => "Users can request stories.",
+        labels       => "label 1, label 2, another label",
+    };
+
+    my $story_details_2 = {
+        requested_by => "Alice",
+        name         => "Release #1",
+        deadline     => "Dec 31, 2008",
+    };
+
+    my $story = add_story($token, $project_id, $story_details);
+    my $story_2 = add_story($token, $project_id, $story_details_2);
 
 =cut
 
@@ -319,9 +389,9 @@ L<http://search.cpan.org/dist/WWW-PivotalTracker/>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
 
+Chris Hellmuth
 
 =head1 COPYRIGHT & LICENSE
 
