@@ -12,6 +12,7 @@ use Hash::Merge               qw/ merge     /;
 use Pod::Usage                qw/ pod2usage /;
 use WWW::PivotalTracker qw/
     add_story
+    all_stories
     delete_story
     project_details
     show_story
@@ -230,6 +231,11 @@ sub _get_project_details($project_id)
     return $response;
 }
 
+sub _get_all_stories($project_id)
+{
+    return all_stories(_api_key(), $project_id);
+}
+
 sub _get_story($project_id, $story_id)
 {
     return show_story(_api_key(), $project_id, $story_id);
@@ -358,20 +364,35 @@ sub _main()
         }
     }
     if (exists $opts->{'show_story'}) {
-        unless ($opts->{'story_id'}) {
-            print STDERR "Missing --story-id.\n";
+        unless (exists $opts->{'story_id'} || exists $opts->{'all_stories'}) {
+            print STDERR "Missing --story-id <id> or --all-stories.\n";
             exit 1;
         }
-        my $result = _get_story($project_id, $opts->{'story_id'});
 
-        if (_response_was_successful($result)) {
-            _display_story($story, { show_notes => $opts->{'show_notes'} });
-            exit 0;
+        my $result;
+        if (exists $opts->{'all_stories'}) {
+            $result = _get_all_stories($project_id);
+
+            if (_response_was_successful($result)) {
+                my $stories = 0;
+                foreach my $story (@{$result->{'stories'}}) {
+                    print "=" x 50 . "\n\n" if $stories++ >= 1;
+                    _display_story($story, { show_notes => $opts->{'show_notes'} });
+                }
+                exit 0;
+            }
         }
         else {
-            _display_error($result);
-            exit 1;
+            $result = _get_story($project_id, $opts->{'story_id'});
+
+            if (_response_was_successful($result)) {
+                _display_story($result, { show_notes => $opts->{'show_notes'} });
+                exit 0;
+            }
         }
+
+        _display_error($result);
+        exit 1;
     }
     elsif (exists $opts->{'add_story'}) {
         my $result = _create_story({
