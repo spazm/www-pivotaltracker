@@ -37,6 +37,7 @@ This module provides simple methods to interact with the Pivotal Tracker API.
 
     use WWW::PivotalTracker qw/
         add_story
+        all_stories
         delete_story
         project_details
         show_story
@@ -54,6 +55,7 @@ Nothing is exported by default.  See B<FUNCTIONS> for the exportable functions.
 
 our @EXPORT_OK = qw/
     add_story
+    all_stories
     delete_story
     project_details
     show_story
@@ -146,6 +148,32 @@ sub show_story($token, $project_id, $story_id)
     };
 }
 
+=head2 all_stories
+
+Return an arrayref of story hashrefs (see B<show_story> for story hashref details).
+
+=cut
+
+sub all_stories($token, $project_id)
+{
+    croak("Malformed Project ID: '$project_id'") unless __PACKAGE__->_check_project_id($project_id);
+
+    my $response = __PACKAGE__->_do_request($token, "projects/$project_id/stories", "GET");
+
+    if (!defined $response || lc $response->{'success'} ne 'true') {
+        return {
+            success => 'false',
+            errors  => (defined $response && exists $response->{'errors'} ? $response->{'errors'} : 'Epic fail!'),
+        };
+    }
+
+    my @stories = map { __PACKAGE__->_sanitize_story_xml($_) } @{$response->{'stories'}->{'story'}};
+
+    return {
+        success => 'true',
+        stories => [ @stories ],
+    };
+}
 
 =head2 add_story
 
@@ -195,6 +223,7 @@ sub add_story($token, $project_id, $story_details)
             unless __PACKAGE__->_is_one_of($key, [qw/
                 created_at
                 current_state
+                deadline
                 description
                 estimate
                 labels
