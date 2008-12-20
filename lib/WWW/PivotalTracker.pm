@@ -48,8 +48,7 @@ This module provides simple methods to interact with the Pivotal Tracker API.
 
 =head1 EXPORT
 
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
+Nothing is exported by default.  See B<FUNCTIONS> for the exportable functions.
 
 =cut
 
@@ -139,36 +138,14 @@ sub show_story($token, $project_id, $story_id)
         };
     }
 
-    my $story = $response->{'story'}->[0];
-
-    my $labels = undef;
-    my $notes = undef;
-
-    $labels = $story->{'labels'}->{'label'} if exists $story->{'labels'};
-    $notes = [
-        map +{
-            id     => $_->{'id'}->{'content'},
-            author => $_->{'author'},
-            date   => $_->{'date'},
-            text   => $_->{'text'},
-        }, @{$story->{'notes'}->{'note'}}
-    ] if exists $story->{'notes'};
+    my $story = __PACKAGE__->_sanitize_story_xml($response->{'story'}->[0]);
 
     return {
         success       => 'true',
-        id            => $story->{'id'}->{'content'},
-        name          => $story->{'name'},
-        description   => $story->{'description'},
-        estimate      => $story->{'estimate'}->{'content'},
-        current_state => $story->{'current_state'},
-        created_at    => $story->{'created_at'},
-        story_type    => $story->{'story_type'},
-        requested_by  => $story->{'requested_by'},
-        labels        => $labels,
-        notes         => $notes,
-        url           => $story->{'url'},
+        %{$story},
     };
 }
+
 
 =head2 add_story
 
@@ -215,7 +192,7 @@ sub add_story($token, $project_id, $story_details)
 
     foreach my $key (keys %$story_details) {
         croak("Unrecognized option: $key")
-            unless _is_one_of($key, [qw/
+            unless __PACKAGE__->_is_one_of($key, [qw/
                 created_at
                 current_state
                 description
@@ -227,8 +204,8 @@ sub add_story($token, $project_id, $story_details)
                 story_type
             /]);
     }
-    croak("Name is required for a new story") unless exists $story_details->{'name'};
-    croak("Requested By is required for a new story") unless exists $story_details->{'requested_by'};
+    croak("'name' is required for a new story") unless exists $story_details->{'name'};
+    croak("'requested_by' is required for a new story") unless exists $story_details->{'requested_by'};
 
     my $content = __PACKAGE__->_make_xml({ story => $story_details });
 
@@ -241,19 +218,11 @@ sub add_story($token, $project_id, $story_details)
         };
     }
 
-    my $story = $response->{'story'}->[0];
+    my $story = __PACKAGE__->_sanitize_story_xml($response->{'story'}->[0]);
+
     return {
         success       => 'true',
-        id            => $story->{'id'}->{'content'},
-        name          => $story->{'name'},
-        description   => $story->{'description'},
-        estimate      => $story->{'estimate'}->{'content'},
-        current_state => $story->{'current_state'},
-        created_at    => $story->{'created_at'},
-        story_type    => $story->{'story_type'},
-        requested_by  => $story->{'requested_by'},
-        labels        => (exists $story->{'labels'} ? $story->{'labels'}->{'label'} : undef),
-        url           => $story->{'url'},
+        %{$story},
     };
 }
 
@@ -288,9 +257,40 @@ sub _check_project_id($class, $project_id)
     return $project_id =~ m/^\d+$/ ? 1 : 0;
 }
 
-sub _is_one_of($element, $set)
+sub _is_one_of($class, $element, $set)
 {
     return((scalar grep { $_ eq $element } @$set) ? 1 : 0);
+}
+
+sub _sanitize_story_xml($class, $story)
+{
+    my $labels = undef;
+    my $notes = undef;
+
+    $labels = $story->{'labels'}->{'label'} if exists $story->{'labels'};
+    $notes = [
+        map +{
+            id     => $_->{'id'}->{'content'},
+            author => $_->{'author'},
+            date   => $_->{'date'},
+            text   => $_->{'text'},
+        }, @{$story->{'notes'}->{'note'}}
+    ] if exists $story->{'notes'};
+
+    return {
+        id            => $story->{'id'}->{'content'},
+        name          => $story->{'name'},
+        description   => $story->{'description'},
+        estimate      => $story->{'estimate'}->{'content'},
+        current_state => $story->{'current_state'},
+        created_at    => $story->{'created_at'},
+        deadline      => $story->{'deadline'},
+        story_type    => $story->{'story_type'},
+        requested_by  => $story->{'requested_by'},
+        labels        => $labels,
+        notes         => $notes,
+        url           => $story->{'url'},
+    };
 }
 
 sub _do_request($class, $token, $request_url, $request_method; $content)
