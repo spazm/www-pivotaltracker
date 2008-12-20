@@ -212,6 +212,13 @@ sub _api_key()
     return $cfg->{'General'}->{'APIKey'};
 }
 
+sub _get_project_details($project_id)
+{
+    my $response = project_details(_api_key(), $project_id);
+
+    return $response;
+}
+
 sub _create_story($story_opts)
 {
     my $project_id = delete $story_opts->{'project_id'};
@@ -241,9 +248,12 @@ sub _display_project($project)
 {
     my $project_text =
           sprintf("               Name: %s\n", $project->{'name'})
-        . sprintf("        Point Scale: %s\n", $project->{'point_scale'})
-        . sprintf("   Iterations Start: %s\n", $project->{'week_start_day'})
-        . sprintf("Weeks per Iteration: %s\n", $project->{'iteration_weeks'})
+        . sprintf("        Point Scale: %s\n", $project->{'point_scale'});
+    $project_text .=
+          sprintf("   Iterations Start: %s\n", $project->{'week_start_day'})
+            if defined $project->{'week_start_day'};
+    $project_text .=
+          sprintf("Weeks per Iteration: %s\n", $project->{'iteration_weeks'})
         . "\n";
 
     print $project_text;
