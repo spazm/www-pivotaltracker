@@ -57,6 +57,7 @@ pivotal_tracker [options]
    -l --label            Label to apply (May appear more than once, or be a single comma separated list
    -e --estimate         Point estimate for story
    -C --created-at       Date/Time story was created (Defaults to 'now')
+   -d --deadline         Deadline of the story (Only applicable to 'release' story type)
 
  Story Type Options:
    --feature             Set story type to 'feature' (Default for new stories)
@@ -155,6 +156,7 @@ my @options = (
     [ 'label|l=s@'       => 'Label to apply (May appear more than once, or be a single comma separated list', ],
     [ 'estimate|e=s'     => "Point estimate for story",                        ],
     [ 'created-at|C=s'   => "Date/Time story was created (Defaults to 'now')", ],
+    [ 'deadline|d=s'     => "Deadline of the story (Only applicable to 'release' story type)", ],
     [                                                                          ],
     [ 'Story Type Options:',                                                   ],
     [ 'story-type=s'   => [
@@ -284,6 +286,9 @@ sub _display_story($story; $options)
           sprintf("   Requested By: %s\n", $story->{'requested_by'})
         . sprintf("        Created: %s\n", $story->{'created_at'});
     $story_text .=
+          sprintf("       Deadline: %s\n", $story->{'deadline'})
+            if defined $story->{'deadline'};
+    $story_text .=
           sprintf("       Label(s): %s\n", join(", ", @{$story->{'labels'}}))
             if defined $story->{'labels'};
 
@@ -376,6 +381,7 @@ sub _main()
             labels        => (exists $opts->{'label'} ? join(",", @{$opts->{'label'}}) : undef),
             estimate      => $opts->{'estimate'},
             created_at    => $opts->{'created_at'},
+            deadline      => $opts->{'deadline'},
             story_type    => $opts->{'story_type'},
             current_state => $opts->{'state'},
         });
