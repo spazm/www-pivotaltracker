@@ -32,15 +32,15 @@ pivotal_tracker [options]
       --help             Brief help
       --man              Full documentation
    -v --verbose          Make noise
-   -p --project-id       Project ID to query/update
-   -P --project          Named project (from config file) to query/update
+   -p --project          Named project (from config file) to query/update
+   -P --project-id       Project ID to query/update
    -i --story-id         Story ID to query/update
 
  Actions:
       --list-projects    List all named projects, and their project IDs
       --show-project     Display the current settings for a project
    -a --add-story        Add a new story
-   -d --delete-story     Delete an existing story
+   -D --delete-story     Delete an existing story
    -s --show-story       Show single story
    -A --all-stories      Show all stories for project
    -c --comment          Comment on story
@@ -55,7 +55,7 @@ pivotal_tracker [options]
    -C --created-at       Date/Time story was created (Defaults to 'now')
 
  Story Type Options:
-   --feature             Set story type to 'feature'
+   --feature             Set story type to 'feature' (Default for new stories)
    --release             Set story type to 'release'
    --bug                 Set story type to 'bug'
    --chore               Set story type to 'chore'
@@ -85,7 +85,7 @@ Print the man page, and exit.
 
 Show more verbose output.
 
-=item B<-p> B<--project-id>
+=item B<-P> B<--project-id>
 
 Use this Project ID, instead of the one speficied in the config file (if any).
 
@@ -126,15 +126,15 @@ my @options = (
     [ 'help'           => 'Show brief help',                                   ],
     [ 'man'            => 'Full documentation',                                ],
     [ 'verbose|v'      => 'Make noise',                                        ],
-    [ 'project|P=s'    => 'Named project (from config file) to query/update',  ],
-    [ 'project-id|p=i' => 'Project ID to query/update (Required unless --project is specified, or General.DefaultProject is set', ],
+    [ 'project|p=s'    => 'Named project (from config file) to query/update',  ],
+    [ 'project-id|P=i' => 'Project ID to query/update (Required unless --project is specified, or General.DefaultProject is set', ],
     [ 'story-id|i=i'   => 'Story ID to query/update',                          ],
     [                                                                          ],
     [ 'Actions',                                                               ],
     [ 'list-projects'  => 'List all named projects, and their project IDs',    ],
     [ 'show-project'   => 'Display the current settings for a project',        ],
     [ 'add-story|a'    => 'Add a new story',                                   ],
-    [ 'delete-story|d' => 'Delete an existing story',                          ],
+    [ 'delete-story|D' => 'Delete an existing story',                          ],
     [ 'show-story|s'   => 'Show single story',                                 ],
     [ 'all-stories|A'  => 'Show all stories for project',                      ],
     [ 'update-story|u' => 'Update the details of a story',                     ],
@@ -150,7 +150,7 @@ my @options = (
     [                                                                          ],
     [ 'Story Type Options:',                                                   ],
     [ 'story-type=s'   => [
-            [ "feature" => "Set story type to 'feature'", ],
+            [ "feature" => "Set story type to 'feature' (Default for new stories)", ],
             [ "release" => "Set story type to 'release'", ],
             [ "bug"     => "Set story type to 'bug'",     ],
             [ "chore"   => "Set story type to 'chore'",   ],
@@ -395,7 +395,6 @@ sub _main()
             exit 1;
         }
     }
-
 }
 
 _main();
