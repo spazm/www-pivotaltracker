@@ -47,7 +47,11 @@ pivotal_tracker [options]
    -u --update-story     Update the details of a story
       --deliver-all      Deliver all deliverable stories
 
- Story Options:
+ Story Display Options:
+   -n --show-notes       Show stories' notes (if any)
+   -1 --one-line         Show stories one per line
+
+ Story Attributes:
    -S --story            Story title to create
    -b --requested-by     Who requested the story
    -l --label            Label to apply (May appear more than once, or be a single comma separated list
@@ -141,7 +145,11 @@ my @options = (
     [ 'comment|c'      => 'Comment on story',                                  ],
     [ 'deliver-all'    => 'Deliver all deliverable stories',                   ],
     [                                                                          ],
-    [ 'Story Options:',                                                        ],
+    [ ' Story Display Options:',                                               ],
+    [ 'show-notes|n'   => "Show stories' notes (if any)",                      ],
+    [ 'one-line|1'     => "Show stories one per line",                         ],
+    [                                                                          ],
+    [ 'Story Attributes:',                                                     ],
     [ 'story|S=s'        => 'Story title to create',                           ],
     [ 'requested-by|b=s' => 'Who requested the story',                         ],
     [ 'label|l=s@'       => 'Label to apply (May appear more than once, or be a single comma separated list', ],
@@ -260,8 +268,10 @@ sub _display_project($project)
     print $project_text;
 }
 
-sub _display_story($story)
+sub _display_story($story; $options)
 {
+    $options->{'show_notes'} ||= 0;
+
     my $story_text =
           sprintf("Story %s < %s >:\n", $story->{'id'}, $story->{'url'})
         . sprintf("           Name: %s\n", $story->{'name'})
@@ -277,15 +287,19 @@ sub _display_story($story)
           sprintf("       Label(s): %s\n", join(", ", @{$story->{'labels'}}))
             if defined $story->{'labels'};
 
-    if (defined $story->{'notes'}) {
+    if ($options->{'show_notes'} eq '1' && defined $story->{'notes'}) {
         $story_text .= "          Notes:\n";
 
+        my $notes = 0;
         foreach my $note (@{$story->{'notes'}}) {
+            $notes++;
+
             $story_text .= sprintf("            %s (%s):\n", $note->{'author'}, $note->{'date'});
             foreach my $note_line (split("\n", $note->{'text'})) {
                 $story_text .= sprintf("                 %s\n", $note_line);
             }
-            $story_text .= "\n";
+
+            $story_text .= "\n" if $notes < @{$story->{'notes'}};
         }
     }
 
@@ -346,7 +360,7 @@ sub _main()
         my $result = _get_story($project_id, $opts->{'story_id'});
 
         if (_response_was_successful($result)) {
-            _display_story($result);
+            _display_story($story, { show_notes => $opts->{'show_notes'} });
             exit 0;
         }
         else {
