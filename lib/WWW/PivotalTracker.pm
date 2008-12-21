@@ -24,11 +24,11 @@ WWW::PivotalTracker - The great new WWW::PivotalTracker!
 
 =head1 VERSION
 
-Version 0.01
+Version 0.1.0_2
 
 =cut
 
-use version; our $VERSION = qv("0.1.0_1");
+use version; our $VERSION = qv("0.1.0_2");
 
 =head1 SYNOPSIS
 
@@ -392,7 +392,6 @@ You can find documentation for this module with the perldoc command.
 
     perldoc WWW::PivotalTracker
 
-
 You can also look for information at:
 
 =over 4
@@ -431,11 +430,10 @@ Chris Hellmuth
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008 Jacob Helwig, all rights reserved.
+Copyright 2008 Jacob Helwig.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-
 
 =cut
 

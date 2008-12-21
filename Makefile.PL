@@ -2,6 +2,7 @@ use inc::Module::Install;
 
 name     'WWW-PivotalTracker';
 all_from 'lib/WWW/PivotalTracker.pm';
+
 author   'Jacob Helwig <jhelwig@cpan.org>';
 license  'perl';
 
@@ -16,9 +17,9 @@ requires 'Perl6::Parameters';
 requires 'Pod::Usage';
 requires 'XML::Simple';
 
-build_requires 'Test::More';
+test_requires 'Test::Class';
+test_requires 'Test::More';
 
-auto_install;
+install_script 'script/pivotal_tracker';
 
 WriteAll;
-
