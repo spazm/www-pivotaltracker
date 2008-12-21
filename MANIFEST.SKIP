@@ -1,12 +1,11 @@
 blib
 \.git
 \.gitignore
-Makefile$
-Makefile\.old
-MANIFEST.bak
-MANIFEST.skip
+^Makefile$
+^Makefile\.old$
+^MANIFEST\.bak$
+^MANIFEST\.SKIP$
 \.orig$
-.*\.pm~$
 pm_to_lib
 .*\.swp$
 WWW-PivotalTracker-.*
