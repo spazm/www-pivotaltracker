@@ -1,1 +1,7 @@
 .*.swp
+/Makefile
+/Makefile.old
+/MANIFEST.bak
+/META.yml
+/WWW-PivotalTracker-*
+/inc/Module/Install*

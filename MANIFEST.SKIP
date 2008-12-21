@@ -1,0 +1,12 @@
+blib
+\.git
+\.gitignore
+Makefile$
+Makefile\.old
+MANIFEST.bak
+MANIFEST.skip
+\.orig$
+.*\.pm~$
+pm_to_lib
+.*\.swp$
+WWW-PivotalTracker-.*
