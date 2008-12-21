@@ -440,3 +440,5 @@ under the same terms as Perl itself.
 =cut
 
 1;
+
+# vim: set tabstop=4 shiftwidth=4: 
