@@ -24,11 +24,11 @@ WWW::PivotalTracker - The great new WWW::PivotalTracker!
 
 =head1 VERSION
 
-Version 0.1.0_2
+Version 0.1.0_3
 
 =cut
 
-use version; our $VERSION = qv("0.1.0_2");
+use version; our $VERSION = qv("0.1.0_3");
 
 =head1 SYNOPSIS
 
@@ -253,6 +253,17 @@ sub add_story($token, $project_id, $story_details)
         %{$story},
     };
 }
+
+=head2 delete_story
+
+Delete an existing story.
+
+    my $result = delete_story($token, $project_id, $story_id);
+
+    print $result->{'success'};
+    print $result->{'message'};
+
+=cut
 
 sub delete_story($token, $project_id, $story_id)
 {
