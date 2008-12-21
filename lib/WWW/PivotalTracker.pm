@@ -28,8 +28,7 @@ Version 0.01
 
 =cut
 
-our $VERSION = '0.01';
-
+use version; our $VERSION = qv("0.1.0_1");
 
 =head1 SYNOPSIS
 
@@ -382,12 +381,10 @@ Jacob Helwig, C<< <jhelwig at cpan.org> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-www-pivotaltracker at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-PivotalTracker>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-
-
+Please report any bugs or feature requests to C<bug-www-pivotaltracker at rt.cpan.org>,
+or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-PivotalTracker>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
 
 =head1 SUPPORT
 
@@ -399,6 +396,12 @@ You can find documentation for this module with the perldoc command.
 You can also look for information at:
 
 =over 4
+
+=item * Mailing list
+
+L<http://lists.technosorcery.net/listinfo.cgi/www-pivotaltracker-technosorcery.net>
+
+C<< <www-pivotaltracker at lists.technosorcery.net> >>
 
 =item * RT: CPAN's request tracker
 
@@ -416,6 +419,10 @@ L<http://cpanratings.perl.org/d/WWW-PivotalTracker>
 
 L<http://search.cpan.org/dist/WWW-PivotalTracker/>
 
+=item * Source code
+
+L<git://github.com/jhelwig/www-pivotaltracker.git>
+
 =back
 
 =head1 ACKNOWLEDGEMENTS
@@ -432,4 +439,4 @@ under the same terms as Perl itself.
 
 =cut
 
-1; # End of WWW::PivotalTracker
+1;

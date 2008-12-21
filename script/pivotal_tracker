@@ -117,13 +117,17 @@ project name, to project ID mappings.
      Testing: 1
      Another Project: 2
 
+=head1 BUGS
+
+Many flags aren't implemented yet, and are merely placeholders at this point.
+
 =head1 VERSION
 
-0.01 - 2008-12-18
+0.1.0_1 - 2008-12-20
 
 =cut
 
-our $VERSION = "0.01";
+use version; our $VERSION = qv("0.1.0_1");
 
 my $options_format = "usage: %c %o";
 my @options = (
