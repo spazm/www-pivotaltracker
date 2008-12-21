@@ -20,7 +20,7 @@ use XML::Simple qw/
 
 =head1 NAME
 
-WWW::PivotalTracker - The great new WWW::PivotalTracker!
+WWW::PivotalTracker - Functional interface to Pivotal Tracker L<http://www.pivotaltracker.com/>
 
 =head1 VERSION
 
