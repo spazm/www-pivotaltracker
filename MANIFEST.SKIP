@@ -1,6 +1,7 @@
 blib
 \.git
-\.gitignore
+\.gitignore$
+\.releaserc$
 ^Makefile$
 ^Makefile\.old$
 ^MANIFEST\.bak$
