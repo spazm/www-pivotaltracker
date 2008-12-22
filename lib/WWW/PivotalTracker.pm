@@ -26,11 +26,11 @@ WWW::PivotalTracker - Functional interface to Pivotal Tracker L<http://www.pivot
 
 =head1 VERSION
 
-Version 0.1.0_4
+Version 0.1.0_5
 
 =cut
 
-use version; our $VERSION = qv("0.1.0_4");
+use version; our $VERSION = qv("0.1.0_5");
 
 =head1 SYNOPSIS
 
