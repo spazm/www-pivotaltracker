@@ -1,5 +1,8 @@
 Revision history for WWW-PivotalTracker
 
+0.1.0_4 2008-12-21
+        Create tests for WWW::PivotalTracker
+
 0.1.0_3 2008-12-21
         Update some of the POD.
 

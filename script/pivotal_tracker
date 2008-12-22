@@ -121,11 +121,11 @@ Many flags aren't implemented yet, and are merely placeholders at this point.
 
 =head1 VERSION
 
-0.1.0_3 - 2008-12-21
+0.1.0_4 - 2008-12-22
 
 =cut
 
-use version; our $VERSION = qv("0.1.0_3");
+use version; our $VERSION = qv("0.1.0_4");
 
 my $options_format = "usage: %c %o";
 my @options = (
