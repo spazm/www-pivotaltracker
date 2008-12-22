@@ -1,0 +1,618 @@
+package Test::WWW::PivotalTracker;
+
+use strict;
+use warnings;
+
+use base qw(Test::Class);
+
+use Sub::Override;
+use Test::Most;
+
+sub make_fixture : Test(setup => 1) {
+    my $self = shift;
+
+    use_ok('WWW::PivotalTracker');
+
+    $self->{'override'} = Sub::Override->new(
+        'WWW::PivotalTracker::_post_request' => sub($$) {
+            die "You should override _post_request, so you're not depending on PivotalTracker being available.";
+        }
+    );
+}
+
+sub TEST__IS_ONE_OF : Test(4) {
+    is(
+        WWW::PivotalTracker->_is_one_of('foo', [qw/ foo /]),
+        1,
+        "foo is in [qw/ foo /]",
+    );
+
+    is(
+        WWW::PivotalTracker->_is_one_of('bar', [qw/ foo /]),
+        0,
+        "bar is not in [qw/ foo /]",
+    );
+
+    is(
+        WWW::PivotalTracker->_is_one_of('foo', [qw/ bar baz foo qux /]),
+        1,
+        "Find element, even if it's not the first one in the list.",
+    );
+
+    is(
+        WWW::PivotalTracker->_is_one_of('cheese', [qw/ bar baz foo qux /]),
+        0,
+        "Doesn't find element, even if there's more than one element in the list.",
+    );
+}
+
+sub TEST__CHECK_PROJECT_ID : Test(3) {
+    is(
+        WWW::PivotalTracker->_check_project_id(1234),
+        1,
+        "'1234' is a valid project id",
+    );
+
+    is(
+        WWW::PivotalTracker->_check_project_id('12a34'),
+        0,
+        "'12a34' is not a valid project id",
+    );
+
+    is(
+        WWW::PivotalTracker->_check_project_id('a'),
+        0,
+        "'a' is not a valid project id",
+    );
+}
+
+sub TEST__CHECK_STORY_ID : Test(3) {
+    is(
+        WWW::PivotalTracker->_check_story_id(1234),
+        1,
+        "'1234' is a valid story id",
+    );
+
+    is(
+        WWW::PivotalTracker->_check_story_id('12a34'),
+        0,
+        "'12a34' is not a valid story id",
+    );
+
+    is(
+        WWW::PivotalTracker->_check_story_id('a'),
+        0,
+        "'a' is not a valid story id",
+    );
+}
+
+sub TEST__DO_REQUEST__ARRAYIFIES_ELEMENTS_THAT_COULD_APPEAR_MORE_THAN_ONCE : Test(4) {
+    my $self = shift;
+
+    $self->{'override'}->replace(
+        'WWW::PivotalTracker::_post_request' => sub($$) {
+            return <<"            HERE";
+<?xml version="1.0" encoding="UTF-8"?>
+<response success="true">
+  <story>
+    <id type="integer">320532</id>
+    <story_type>release</story_type>
+    <url>https://www.pivotaltracker.com/story/show/320532</url>
+    <estimate type="integer">-1</estimate>
+    <current_state>unscheduled</current_state>
+    <description></description>
+    <name>Release 1</name>
+    <requested_by>Jacob Helwig</requested_by>
+    <created_at>Dec 20, 2008</created_at>
+    <deadline>Dec 31, 2008</deadline>
+    <notes type="array">
+      <note>
+        <id type="integer">209033</id>
+        <text>Comment!</text>
+        <author>Jacob Helwig</author>
+        <date>Dec 20, 2008</date>
+      </note>
+    </notes>
+    <labels type="array">
+      <label>needs feedback</label>
+    </labels>
+  </story>
+</response>
+            HERE
+        }
+    );
+
+    my $response = WWW::PivotalTracker->_do_request('token', 'some/place', 'GET');
+
+    ok(defined $response);
+
+    isa_ok(
+        $response->{'story'},
+        'ARRAY',
+        '$response->{story}',
+    );
+
+    isa_ok(
+        $response->{'story'}->[0]->{'notes'}->{'note'},
+        'ARRAY',
+        '$response->{story}->[0]->{notes}->{note}',
+    );
+
+    isa_ok(
+        $response->{'story'}->[0]->{'labels'}->{'label'},
+        'ARRAY',
+        '$response->{story}->[0]->{labels}->{label}',
+    );
+}
+
+sub TEST__SANITIZE_STORY_XML : Test(4) {
+    my $self = shift;
+
+    $self->{'override'}->replace(
+        'WWW::PivotalTracker::_post_request' => sub($$) {
+            return <<"            HERE";
+<?xml version="1.0" encoding="UTF-8"?>
+<response success="true">
+  <story>
+    <id type="integer">320532</id>
+    <story_type>release</story_type>
+    <url>https://www.pivotaltracker.com/story/show/320532</url>
+    <estimate type="integer">-1</estimate>
+    <current_state>unscheduled</current_state>
+    <description></description>
+    <name>Release 1</name>
+    <requested_by>Jacob Helwig</requested_by>
+    <created_at>Dec 20, 2008</created_at>
+    <deadline>Dec 31, 2008</deadline>
+    <notes type="array">
+      <note>
+        <id type="integer">209033</id>
+        <text>Comment!</text>
+        <author>Jacob Helwig</author>
+        <date>Dec 20, 2008</date>
+      </note>
+    </notes>
+    <labels type="array">
+      <label>needs feedback</label>
+    </labels>
+  </story>
+</response>
+            HERE
+        }
+    );
+
+    my $response = WWW::PivotalTracker->_do_request('c0ffe', 'request/goes/here', 'GET');
+    isa_ok($response, 'HASH', '_do_request return value');
+
+    eq_or_diff(
+        $response,
+        {
+            success => 'true',
+            story => [{
+                created_at    => 'Dec 20, 2008',
+                current_state => 'unscheduled',
+                deadline      => 'Dec 31, 2008',
+                description   => undef,
+                estimate      => { type => 'integer', content => '-1', },
+                id            => { type => 'integer', content => '320532', },
+                name          => 'Release 1',
+                requested_by  => 'Jacob Helwig',
+                story_type    => 'release',
+                url           => 'https://www.pivotaltracker.com/story/show/320532',
+                labels => {
+                    type => 'array',
+                    label => [ 'needs feedback', ],
+                },
+                notes => {
+                    type => 'array',
+                    note => [{
+                        author => 'Jacob Helwig',
+                        date   => 'Dec 20, 2008',
+                        id     => { type => 'integer', content => '209033', },
+                        text   => 'Comment!',
+                    }],
+                },
+            }],
+        },
+        '$response ok',
+    );
+
+    my $sanitized_response = WWW::PivotalTracker->_sanitize_story_xml($response->{'story'}->[0]);
+    isa_ok($sanitized_response, 'HASH', '_sanitize_story_xml return value');
+
+    eq_or_diff(
+        $sanitized_response,
+        {
+            created_at    => 'Dec 20, 2008',
+            current_state => 'unscheduled',
+            deadline      => 'Dec 31, 2008',
+            description   => undef,
+            estimate      => '-1',
+            id            => '320532',
+            labels        => [ 'needs feedback', ],
+            name          => 'Release 1',
+            requested_by  => 'Jacob Helwig',
+            story_type    => 'release',
+            url           => 'https://www.pivotaltracker.com/story/show/320532',
+            notes => [{
+                author => 'Jacob Helwig',
+                date   => 'Dec 20, 2008',
+                id     => '209033',
+                text   => 'Comment!',
+            }],
+        },
+        '$sanitized_response ok',
+    );
+}
+
+sub TEST_PROJECT_DETAILS__BASE_CASE : Test(3) {
+    my $self = shift;
+
+    $self->{'override'}->replace(
+        'WWW::PivotalTracker::_post_request' => sub($$) {
+            return <<"            HERE";
+<?xml version="1.0" encoding="UTF-8"?>
+<response success="true">
+  <project>
+    <name>Sample Project</name>
+    <iteration_length type="integer">2</iteration_length>
+    <week_start_day>Monday</week_start_day>
+    <point_scale>0,1,2,3</point_scale>
+  </project>
+</response>
+            HERE
+        }
+    );
+
+    use_ok('WWW::PivotalTracker', qw/ project_details /);
+
+    my $response = project_details('c0ffe', 1);
+
+    isa_ok($response, 'HASH', 'project_details return value');
+
+    eq_or_diff(
+        $response,
+        {
+            success         => 'true',
+            iteration_weeks => '2',
+            name            => 'Sample Project',
+            point_scale     => '0,1,2,3',
+            start_day       => 'Monday',
+        },
+        "project_details response ok"
+    );
+}
+
+sub TEST_PROJECT_DETAILS__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE : Test(3) {
+    my $self = shift;
+
+    $self->{'override'}->replace(
+        'WWW::PivotalTracker::_post_request' => sub($$) {
+            return <<"            HERE";
+<?xml version="1.0" encoding="UTF-8"?>
+<response success="false">
+  <errors>
+    <error>No API access allowed</error>
+  </errors>
+</response>
+            HERE
+        }
+    );
+
+    use_ok('WWW::PivotalTracker', qw/ project_details /);
+
+    my $response = project_details('c0ffe', 1);
+
+    isa_ok($response, 'HASH', 'project_details return value');
+
+    eq_or_diff(
+        $response,
+        {
+            success => 'false',
+            errors  => [
+                'No API access allowed',
+            ],
+        },
+        "project_details response ok"
+    );
+}
+
+sub TEST_SHOW_STORY__BASE_CASE : Test(3) {
+    my $self = shift;
+
+    $self->{'override'}->replace(
+        'WWW::PivotalTracker::_post_request' => sub($$) {
+            return <<"            HERE";
+<?xml version="1.0" encoding="UTF-8"?>
+<response success="true">
+  <story>
+    <id type="integer">320532</id>
+    <story_type>release</story_type>
+    <url>https://www.pivotaltracker.com/story/show/320532</url>
+    <estimate type="integer">-1</estimate>
+    <current_state>unscheduled</current_state>
+    <description></description>
+    <name>Release 1</name>
+    <requested_by>Jacob Helwig</requested_by>
+    <created_at>Dec 20, 2008</created_at>
+    <deadline>Dec 31, 2008</deadline>
+    <notes type="array">
+      <note>
+        <id type="integer">209033</id>
+        <text>Comment!</text>
+        <author>Jacob Helwig</author>
+        <date>Dec 20, 2008</date>
+      </note>
+    </notes>
+    <labels type="array">
+      <label>needs feedback</label>
+    </labels>
+  </story>
+</response>
+            HERE
+        }
+    );
+
+    use_ok('WWW::PivotalTracker', qw/ show_story /);
+
+    my $response = show_story('c0ffe', 1, 320532);
+    isa_ok($response, 'HASH', 'show_story return value');
+
+    eq_or_diff(
+        $response,
+        {
+            success       => 'true',
+            created_at    => 'Dec 20, 2008',
+            current_state => 'unscheduled',
+            deadline      => 'Dec 31, 2008',
+            description   => undef,
+            estimate      => '-1',
+            id            => '320532',
+            labels        => [ 'needs feedback', ],
+            name          => 'Release 1',
+            requested_by  => 'Jacob Helwig',
+            story_type    => 'release',
+            url           => 'https://www.pivotaltracker.com/story/show/320532',
+            notes => [{
+                author => 'Jacob Helwig',
+                date   => 'Dec 20, 2008',
+                id     => '209033',
+                text   => 'Comment!',
+            }],
+        },
+        'show_story ok',
+    );
+}
+
+sub TEST_SHOW_STORY__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE : Test(3) {
+    my $self = shift;
+
+    $self->{'override'}->replace(
+        'WWW::PivotalTracker::_post_request' => sub($$) {
+            return <<"            HERE";
+<?xml version="1.0" encoding="UTF-8"?>
+<response success="false">
+  <errors>
+    <error>No API access allowed</error>
+  </errors>
+</response>
+            HERE
+        }
+    );
+
+    use_ok('WWW::PivotalTracker', qw/ show_story /);
+
+    my $response = show_story('c0ffe', 1, 320532);
+    isa_ok($response, 'HASH', 'show_story return value');
+
+    eq_or_diff(
+        $response,
+        {
+            success => 'false',
+            errors  => [ 'No API access allowed', ],
+        },
+        'show_story ok',
+    );
+}
+
+sub TEST_ALL_STORIES_BASE_CASE : Test(3) {
+    my $self = shift;
+
+    $self->{'override'}->replace(
+        'WWW::PivotalTracker::_post_request' => sub($$) {
+            return <<"            HERE";
+<?xml version="1.0" encoding="UTF-8"?>
+<response success="true">
+  <message>2 stories found</message>
+  <stories count="2">
+    <story>
+      <id type="integer">320532</id>
+      <story_type>release</story_type>
+      <url>https://www.pivotaltracker.com/story/show/320532</url>
+      <estimate type="integer">-1</estimate>
+      <current_state>unscheduled</current_state>
+      <description></description>
+      <name>Release 1</name>
+      <requested_by>Jacob Helwig</requested_by>
+      <created_at>Dec 20, 2008</created_at>
+      <deadline>Dec 31, 2008</deadline>
+      <notes type="array">
+        <note>
+          <id type="integer">209033</id>
+          <text>Comment!</text>
+          <author>Jacob Helwig</author>
+          <date>Dec 20, 2008</date>
+        </note>
+        <note>
+          <id type="integer">209034</id>
+          <text>Another comment!</text>
+          <author>Jacob Helwig</author>
+          <date>Dec 20, 2008</date>
+        </note>
+      </notes>
+    </story>
+    <story>
+      <id type="integer">320008</id>
+      <story_type>feature</story_type>
+      <url>https://www.pivotaltracker.com/story/show/320008</url>
+      <estimate type="integer">-1</estimate>
+      <current_state>unscheduled</current_state>
+      <description></description>
+      <name>Story!</name>
+      <requested_by>Jacob Helwig</requested_by>
+      <created_at>Dec 20, 2008</created_at>
+      <labels type="array">
+        <label>needs feedback</label>
+      </labels>
+    </story>
+  </stories>
+</response>
+            HERE
+        }
+    );
+
+    use_ok('WWW::PivotalTracker', qw/ all_stories /);
+
+    my $response = all_stories('c0ffe', 1);
+    isa_ok($response, 'HASH', 'all_stories return value');
+
+    eq_or_diff(
+        $response,
+        {
+            success => 'true',
+            stories => [
+                {
+                  created_at    => 'Dec 20, 2008',
+                  current_state => 'unscheduled',
+                  deadline      => 'Dec 31, 2008',
+                  description   => undef,
+                  estimate      => '-1',
+                  id            => '320532',
+                  labels        => undef,
+                  name          => 'Release 1',
+                  requested_by  => 'Jacob Helwig',
+                  story_type    => 'release',
+                  url           => 'https://www.pivotaltracker.com/story/show/320532',
+                  notes => [
+                    {
+                      author => 'Jacob Helwig',
+                      date   => 'Dec 20, 2008',
+                      id     => '209033',
+                      text   => 'Comment!'
+                    },
+                    {
+                      author => 'Jacob Helwig',
+                      date   => 'Dec 20, 2008',
+                      id     => '209034',
+                      text   => 'Another comment!'
+                    }
+                  ],
+                },
+                {
+                  created_at    => 'Dec 20, 2008',
+                  current_state => 'unscheduled',
+                  deadline      => undef,
+                  description   => undef,
+                  estimate      => '-1',
+                  id            => '320008',
+                  name          => 'Story!',
+                  notes         => undef,
+                  requested_by  => 'Jacob Helwig',
+                  story_type    => 'feature',
+                  url           => 'https://www.pivotaltracker.com/story/show/320008',
+                  labels => [
+                    'needs feedback'
+                  ],
+                }
+            ],
+        },
+        'all_stories ok',
+    );
+}
+
+sub TEST_ALL_STORIES__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE : Test(3) {
+    my $self = shift;
+
+    $self->{'override'}->replace(
+        'WWW::PivotalTracker::_post_request' => sub($$) {
+            return <<"            HERE";
+<?xml version="1.0" encoding="UTF-8"?>
+<response success="false">
+  <errors>
+    <error>No API access allowed</error>
+  </errors>
+</response>
+            HERE
+        }
+    );
+
+    use_ok('WWW::PivotalTracker', qw/ all_stories /);
+
+    my $response = all_stories('c0ffe', 1);
+    isa_ok($response, 'HASH', 'show_story return value');
+
+    eq_or_diff(
+        $response,
+        {
+            success => 'false',
+            errors  => [ 'No API access allowed', ],
+        },
+        'show_story ok',
+    );
+}
+
+sub teardown : Test(teardown) {
+    my $self = shift;
+
+    $self->{'override'} = undef;
+};
+
+1;
+
+__END__
+
+<?xml version="1.0" encoding="UTF-8"?>
+<response success="true">
+  <message>2 stories found</message>
+  <stories count="2">
+    <story>
+      <id type="integer">320532</id>
+      <story_type>release</story_type>
+      <url>https://www.pivotaltracker.com/story/show/320532</url>
+      <estimate type="integer">-1</estimate>
+      <current_state>unscheduled</current_state>
+      <description></description>
+      <name>Release 1</name>
+      <requested_by>Jacob Helwig</requested_by>
+      <created_at>Dec 20, 2008</created_at>
+      <deadline>Dec 31, 2008</deadline>
+      <notes type="array">
+        <note>
+          <id type="integer">209033</id>
+          <text>Comment!</text>
+          <author>Jacob Helwig</author>
+          <date>Dec 20, 2008</date>
+        </note>
+        <note>
+          <id type="integer">209034</id>
+          <text>Another comment!</text>
+          <author>Jacob Helwig</author>
+          <date>Dec 20, 2008</date>
+        </note>
+      </notes>
+    </story>
+    <story>
+      <id type="integer">320008</id>
+      <story_type>feature</story_type>
+      <url>https://www.pivotaltracker.com/story/show/320008</url>
+      <estimate type="integer">-1</estimate>
+      <current_state>unscheduled</current_state>
+      <description></description>
+      <name>Story!</name>
+      <requested_by>Jacob Helwig</requested_by>
+      <created_at>Dec 20, 2008</created_at>
+    </story>
+  </stories>
+</response>
+
+# vim: set tabstop=4 shiftwidth=4:

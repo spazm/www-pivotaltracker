@@ -18,7 +18,7 @@ requires 'Pod::Usage';
 requires 'XML::Simple';
 
 test_requires 'Test::Class';
-test_requires 'Test::More';
+test_requires 'Test::Most';
 
 install_script 'script/pivotal_tracker';
 
