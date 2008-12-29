@@ -1,14 +1,13 @@
-Revision history for WWW-PivotalTracker
+Revision history for Perl extension WWW-PivotalTracker
 
-0.1.0_5 2008-12-22
-        Add missing requires, and test_requires lines in Makefile.PL
+0.01_05  Mon, 22 Dec 2008 00:00:00 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Add missing requires, and test_Requires lines in Makefile.PL
 
-0.1.0_4 2008-12-21
-        Create tests for WWW::PivotalTracker
+0.01_04  Sun, 21 Dec 2008 00:00:00 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Create tests for WWW::PivotalTracker
 
-0.1.0_3 2008-12-21
-        Update some of the POD.
+0.01_03  Sun, 21 Dec 2008 00:00:00 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Update some of the POD.
 
-0.1.0_2 2008-12-20
-        First developer version, released on an unsuspecting world.
-
+0.01_02  Sat, 20 Dec 2008 00:00:00 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - First developer version released to CPAN
