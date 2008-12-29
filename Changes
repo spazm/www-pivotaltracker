@@ -1,5 +1,8 @@
 Revision history for WWW-PivotalTracker
 
+0.1.0_5 2008-12-22
+        Add missing requires, and test_requires lines in Makefile.PL
+
 0.1.0_4 2008-12-21
         Create tests for WWW::PivotalTracker
 
