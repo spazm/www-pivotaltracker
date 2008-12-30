@@ -30,7 +30,7 @@ Version 0.1.0_5
 
 =cut
 
-use version; our $VERSION = qv("0.1.0_5");
+use version; our $VERSION = qv("0.10_05");
 
 =head1 SYNOPSIS
 
