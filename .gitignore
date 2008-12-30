@@ -6,3 +6,5 @@
 /META.yml
 /WWW-PivotalTracker-*
 /inc/Module/Install*
+/blib
+/pm_to_blib
