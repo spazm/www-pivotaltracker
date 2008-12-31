@@ -8,7 +8,8 @@ use base qw(Test::Class);
 use Sub::Override;
 use Test::Most;
 
-sub make_fixture : Test(setup => 1) {
+sub make_fixture : Test(setup => 1)
+{
     my $self = shift;
 
     use_ok('WWW::PivotalTracker');
@@ -20,7 +21,8 @@ sub make_fixture : Test(setup => 1) {
     );
 }
 
-sub TEST__IS_ONE_OF : Test(4) {
+sub TEST__IS_ONE_OF : Test(4)
+{
     is(
         WWW::PivotalTracker->_is_one_of('foo', [qw/ foo /]),
         1,
@@ -46,7 +48,8 @@ sub TEST__IS_ONE_OF : Test(4) {
     );
 }
 
-sub TEST__CHECK_PROJECT_ID : Test(3) {
+sub TEST__CHECK_PROJECT_ID : Test(3)
+{
     is(
         WWW::PivotalTracker->_check_project_id(1234),
         1,
@@ -66,7 +69,8 @@ sub TEST__CHECK_PROJECT_ID : Test(3) {
     );
 }
 
-sub TEST__CHECK_STORY_ID : Test(3) {
+sub TEST__CHECK_STORY_ID : Test(3)
+{
     is(
         WWW::PivotalTracker->_check_story_id(1234),
         1,
@@ -86,7 +90,8 @@ sub TEST__CHECK_STORY_ID : Test(3) {
     );
 }
 
-sub TEST__DO_REQUEST__ARRAYIFIES_ELEMENTS_THAT_COULD_APPEAR_MORE_THAN_ONCE : Test(4) {
+sub TEST__DO_REQUEST__ARRAYIFIES_ELEMENTS_THAT_COULD_APPEAR_MORE_THAN_ONCE : Test(4)
+{
     my $self = shift;
 
     $self->{'override'}->replace(
@@ -145,7 +150,8 @@ sub TEST__DO_REQUEST__ARRAYIFIES_ELEMENTS_THAT_COULD_APPEAR_MORE_THAN_ONCE : Tes
     );
 }
 
-sub TEST__SANITIZE_STORY_XML : Test(4) {
+sub TEST__SANITIZE_STORY_XML : Test(4)
+{
     my $self = shift;
 
     $self->{'override'}->replace(
@@ -245,7 +251,8 @@ sub TEST__SANITIZE_STORY_XML : Test(4) {
     );
 }
 
-sub TEST_PROJECT_DETAILS__BASE_CASE : Test(3) {
+sub TEST_PROJECT_DETAILS__BASE_CASE : Test(3)
+{
     my $self = shift;
 
     $self->{'override'}->replace(
@@ -283,7 +290,8 @@ sub TEST_PROJECT_DETAILS__BASE_CASE : Test(3) {
     );
 }
 
-sub TEST_PROJECT_DETAILS__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE : Test(3) {
+sub TEST_PROJECT_DETAILS__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE : Test(3)
+{
     my $self = shift;
 
     $self->{'override'}->replace(
@@ -317,7 +325,8 @@ sub TEST_PROJECT_DETAILS__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE : Test(3) {
     );
 }
 
-sub TEST_SHOW_STORY__BASE_CASE : Test(3) {
+sub TEST_SHOW_STORY__BASE_CASE : Test(3)
+{
     my $self = shift;
 
     $self->{'override'}->replace(
@@ -384,7 +393,8 @@ sub TEST_SHOW_STORY__BASE_CASE : Test(3) {
     );
 }
 
-sub TEST_SHOW_STORY__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE : Test(3) {
+sub TEST_SHOW_STORY__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE : Test(3)
+{
     my $self = shift;
 
     $self->{'override'}->replace(
@@ -415,7 +425,8 @@ sub TEST_SHOW_STORY__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE : Test(3) {
     );
 }
 
-sub TEST_ALL_STORIES_BASE_CASE : Test(3) {
+sub TEST_ALL_STORIES_BASE_CASE : Test(3)
+{
     my $self = shift;
 
     $self->{'override'}->replace(
@@ -530,7 +541,8 @@ sub TEST_ALL_STORIES_BASE_CASE : Test(3) {
     );
 }
 
-sub TEST_ALL_STORIES__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE : Test(3) {
+sub TEST_ALL_STORIES__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE : Test(3)
+{
     my $self = shift;
 
     $self->{'override'}->replace(
@@ -561,7 +573,8 @@ sub TEST_ALL_STORIES__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE : Test(3) {
     );
 }
 
-sub teardown : Test(teardown) {
+sub teardown : Test(teardown)
+{
     my $self = shift;
 
     $self->{'override'} = undef;
