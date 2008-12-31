@@ -106,14 +106,14 @@ For a programmatic interface, please see L<WWW::PivotalTracker>.
 B<~/.pivotal_tracker.yml> contains the configuration of default values, and 
 project name, to project ID mappings.
 
- ---
- General:
-     APIKey: 'c0ffe'
-     Me: Jacob Helwig
-     DefaultProject: Testing
- Projects:
-     Testing: 1
-     Another Project: 2
+    ---
+    General:
+      APIKey: 'c0ffe'
+      Me: Jacob Helwig
+      DefaultProject: Testing
+    Projects:
+      Testing: 1
+      Another Project: 2
 
 =head1 BUGS
 
