@@ -91,7 +91,6 @@ sub project_details($token, $project_id) {
 
     my $response = __PACKAGE__->_do_request($token, "projects/$project_id", "GET");
 
-
     if (!defined $response || lc $response->{'success'} ne 'true') {
         return {
             success => 'false',
@@ -383,7 +382,7 @@ sub _post_request($class, $request)
 
     croak($response->status_line()) unless ($response->is_success());
 
-    return $response;
+    return $response->content();
 }
 
 sub _make_xml($class, HASH $data)
