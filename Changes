@@ -4,25 +4,40 @@ global:
 releases:
   - author: 'Jacob Helwig <jhelwig@cpan.org>'
     changes:
+      - Fix capitalization of test_requires for Sub::Override
+      - 'Update Changes file, and add Test::CheckChanges test.'
+      - Maintain Changes file using Module::Changes and Changes.yml
+      - 'Add blib, and pm_to_blib to .gitignore'
+      - Use a Module::Changes (YAML) based Changes file.
+      - Fix formatting in tests for WWW::PivotalTracker
+      - Fix formatting of example script config file.
+      - Actually return content from _post_request.
+      - Minor tweaks necessary for using ShipIt.
+      - Remove VERSION section from POD
+    date: 2008-12-31T18:05:28Z
+    tags: []
+    version: 0.11
+  - author: 'Jacob Helwig <jhelwig@cpan.org>'
+    changes:
       - 'Add missing requires, and test_Requires lines in Makefile.PL'
     date: 2008-12-22T00:00:00
     tags: []
-    version: 0.10.00_05
+    version: 0.10_05
   - author: 'Jacob Helwig <jhelwig@cpan.org>'
     changes:
       - Create tests for WWW::PivotalTracker
     date: 2008-12-21T00:00:00
     tags: []
-    version: 0.10.00_04
+    version: 0.10_04
   - author: 'Jacob Helwig <jhelwig@cpan.org>'
     changes:
       - Update some of the POD.
     date: 2008-12-21T00:00:00
     tags: []
-    version: 0.10.00_03
+    version: 0.10_03
   - author: 'Jacob Helwig <jhelwig@cpan.org>'
     changes:
-      - 'First developer version released to CPAN'
+      - First developer version released to CPAN
     date: 2008-12-20T00:00:00
     tags: []
-    version: 0.10.00_02
+    version: 0.10_02

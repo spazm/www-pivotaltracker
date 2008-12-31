@@ -1,5 +1,17 @@
 Revision history for Perl extension WWW-PivotalTracker
 
+0.11  Wed, 31 Dec 2008 18:05:28 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Fix capitalization of test_requires for Sub::Override
+     - Update Changes file, and add Test::CheckChanges test.
+     - Maintain Changes file using Module::Changes and Changes.yml
+     - Add blib, and pm_to_blib to .gitignore
+     - Use a Module::Changes (YAML) based Changes file.
+     - Fix formatting in tests for WWW::PivotalTracker
+     - Fix formatting of example script config file.
+     - Actually return content from _post_request.
+     - Minor tweaks necessary for using ShipIt.
+     - Remove VERSION section from POD
+
 0.10_05  Mon, 22 Dec 2008 00:00:00 -0000 (Jacob Helwig <jhelwig@cpan.org>)
      - Add missing requires, and test_Requires lines in Makefile.PL
 
