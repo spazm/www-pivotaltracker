@@ -24,10 +24,6 @@ use XML::Simple qw/
 
 WWW::PivotalTracker - Functional interface to Pivotal Tracker L<http://www.pivotaltracker.com/>
 
-=head1 VERSION
-
-Version 0.1.0_5
-
 =cut
 
 our $VERSION = "0.10_05";
