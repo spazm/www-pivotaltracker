@@ -445,8 +445,8 @@ sub TEST_SHOW_STORY__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE : Test(3)
 }
 #}}}
 
-#{{{ sub TEST_ALL_STORIES_BASE_CASE
-sub TEST_ALL_STORIES_BASE_CASE : Test(3)
+#{{{ sub TEST_ALL_STORIES__BASE_CASE
+sub TEST_ALL_STORIES__BASE_CASE : Test(3)
 {
     my $self = shift;
 
@@ -597,22 +597,43 @@ sub TEST_ALL_STORIES__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE : Test(3)
 }
 #}}}
 
-#{{{ sub teardown
-sub teardown : Test(teardown)
+#{{{ sub TEST_STORIES_FOR_FILTER__URL_ENCODES_FILTER
+sub TEST_STORIES_FOR_FILTER__URL_ENCODES_FILTER : Test(2)
 {
     my $self = shift;
 
-    $self->{'override'} = undef;
+    my $query_string;
+
+    $self->{'override'}->replace(
+        'WWW::PivotalTracker::_do_request' => sub($$$$;$) {
+            $query_string = $_[2];
+
+            return {
+                success => 'false',
+                errors  => [ 'Dummy Data', ],
+            };
+        }
+    );
+
+    use_ok('WWW::PivotalTracker', qw/ stories_for_filter /);
+
+    my $response = stories_for_filter('c0ffe', 1, 'This should be URL <Encoded>');
+
+    eq_or_diff($query_string, "projects/1/stories?filter=This%20should%20be%20URL%20%3CEncoded%3E", "stories_for_filter URL encodes filter");
 }
 #}}}
 
-1;
+#{{{ sub TEST_STORIES_FOR_FILTER__SANITIZES_STORY_XML
+sub TEST_STORIES_FOR_FILTER__SANITIZES_STORY_XML : Test(3)
+{
+    my $self = shift;
 
-__END__
-
+    $self->{'override'}->replace(
+        'WWW::PivotalTracker::_post_request' => sub($$) {
+            return <<"            HERE";
 <?xml version="1.0" encoding="UTF-8"?>
 <response success="true">
-  <message>2 stories found</message>
+  <message>2 stories found for filter 'requested_by:"Jacob Helwig"'</message>
   <stories count="2">
     <story>
       <id type="integer">320532</id>
@@ -650,8 +671,88 @@ __END__
       <name>Story!</name>
       <requested_by>Jacob Helwig</requested_by>
       <created_at>Dec 20, 2008</created_at>
+      <labels type="array">
+        <label>needs feedback</label>
+      </labels>
     </story>
   </stories>
 </response>
+            HERE
+        }
+    );
+
+    use_ok('WWW::PivotalTracker', qw/ stories_for_filter /);
+
+    my $response = stories_for_filter('c0ffe', 1, 'requested_by:"Jacob Helwig"');
+    isa_ok($response, 'HASH', 'stories_for_filter return value');
+
+    eq_or_diff(
+        $response,
+        {
+            message => q{2 stories found for filter 'requested_by:"Jacob Helwig"'},
+            success => 'true',
+            stories => [
+                {
+                  created_at    => 'Dec 20, 2008',
+                  current_state => 'unscheduled',
+                  deadline      => 'Dec 31, 2008',
+                  description   => undef,
+                  estimate      => '-1',
+                  id            => '320532',
+                  labels        => undef,
+                  name          => 'Release 1',
+                  requested_by  => 'Jacob Helwig',
+                  story_type    => 'release',
+                  url           => 'https://www.pivotaltracker.com/story/show/320532',
+                  notes => [
+                    {
+                      author => 'Jacob Helwig',
+                      date   => 'Dec 20, 2008',
+                      id     => '209033',
+                      text   => 'Comment!'
+                    },
+                    {
+                      author => 'Jacob Helwig',
+                      date   => 'Dec 20, 2008',
+                      id     => '209034',
+                      text   => 'Another comment!'
+                    }
+                  ],
+                },
+                {
+                  created_at    => 'Dec 20, 2008',
+                  current_state => 'unscheduled',
+                  deadline      => undef,
+                  description   => undef,
+                  estimate      => '-1',
+                  id            => '320008',
+                  name          => 'Story!',
+                  notes         => undef,
+                  requested_by  => 'Jacob Helwig',
+                  story_type    => 'feature',
+                  url           => 'https://www.pivotaltracker.com/story/show/320008',
+                  labels => [
+                    'needs feedback'
+                  ],
+                }
+            ],
+        },
+        'stories_for_filter sanitized story XML ok',
+    );
+}
+#}}}
+
+#{{{ sub teardown
+sub teardown : Test(teardown)
+{
+    my $self = shift;
+
+    $self->{'override'} = undef;
+}
+#}}}
+
+1;
+
+__END__
 
 # vim: set tabstop=4 shiftwidth=4 fdm=marker:

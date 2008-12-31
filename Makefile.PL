@@ -17,6 +17,7 @@ requires 'LWP::UserAgent';
 requires 'parent';
 requires 'Perl6::Parameters';
 requires 'Pod::Usage';
+requires 'URI::Escape';
 requires 'XML::Simple';
 
 test_requires 'Sub::Override';

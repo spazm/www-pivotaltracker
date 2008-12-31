@@ -15,6 +15,9 @@ use aliased 'LWP::UserAgent' => '_UserAgent';
 use Carp qw/
     croak
 /;
+use URI::Escape qw/
+    uri_escape
+/;
 use XML::Simple qw/
     XMLin
     XMLout
@@ -38,6 +41,7 @@ This module provides simple methods to interact with the Pivotal Tracker API.
         delete_story
         project_details
         show_story
+        stories_for_filter
     /;
 
     my $details = project_details("API Token", "Project ID");
@@ -56,6 +60,7 @@ our @EXPORT_OK = qw/
     delete_story
     project_details
     show_story
+    stories_for_filter
 /;
 
 #This should never contain anything.  It's just here to make sure that :all
@@ -288,6 +293,53 @@ sub delete_story($token, $project_id, $story_id)
     return {
         success => 'true',
         message => $message,
+    };
+}
+
+=head2 stories_for_filter
+
+Find all stories given search paremeters.
+
+    my $result = stories_for_filter($token, $project_id, $search_filter);
+
+    my @stories;
+    if($result->{'success'} eq 'true') {
+        print $result->{'message'} . "\n";
+
+        @stories = @{$result->{'stories'}};
+    }
+    else {
+        print $result->{'errors'};
+    }
+
+In the example above C<< @stories >> will be an array of story hashrefs.  See the description of B<show_story> for the details of the hashrefs.
+
+Any multi-word terms in the search filter must be enclosed by double quotes.
+
+    Example:
+        requested_by:"Jacob Helwig"
+
+=cut
+
+sub stories_for_filter($token, $project_id, $search_filter)
+{
+    croak("Malformed Project ID: '$project_id'") unless __PACKAGE__->_check_project_id($project_id);
+
+    my $response = __PACKAGE__->_do_request($token, "projects/$project_id/stories?filter=" . uri_escape($search_filter), "GET");
+
+    if (!defined $response || lc $response->{'success'} ne 'true') {
+        return {
+            success => 'false',
+            errors  => (defined $response && exists $response->{'errors'} ? $response->{'errors'} : 'Epic fail!'),
+        };
+    }
+
+    my @stories = map { __PACKAGE__->_sanitize_story_xml($_) } @{$response->{'stories'}->{'story'}};
+
+    return {
+        success => 'true',
+        message => $response->{'message'},
+        stories => [ @stories ],
     };
 }
 

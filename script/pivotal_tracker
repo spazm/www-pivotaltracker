@@ -14,6 +14,7 @@ use WWW::PivotalTracker qw/
     delete_story
     project_details
     show_story
+    stories_for_filter
 /;
 
 use aliased 'Config::Any' => 'Config';
@@ -42,6 +43,7 @@ pivotal_tracker [options]
    -D --delete-story     Delete an existing story
    -s --show-story       Show single story
    -A --all-stories      Show all stories for project
+      --search <filter>  Search for stories given a filter
    -c --comment          Comment on story
    -u --update-story     Update the details of a story
       --deliver-all      Deliver all deliverable stories
@@ -141,6 +143,7 @@ my @options = (
     [ 'delete-story|D' => 'Delete an existing story',                          ],
     [ 'show-story|s'   => 'Show single story',                                 ],
     [ 'all-stories|A'  => 'Show all stories for project',                      ],
+    [ 'search=s'       => 'Search for stories given a filter',                 ],
     [ 'update-story|u' => 'Update the details of a story',                     ],
     [ 'comment|c'      => 'Comment on story',                                  ],
     [ 'deliver-all'    => 'Deliver all deliverable stories',                   ],
@@ -237,6 +240,11 @@ sub _get_story($project_id, $story_id)
     return show_story(_api_key(), $project_id, $story_id);
 }
 
+sub _stories_for_filter($project_id, $filter)
+{
+    return stories_for_filter(_api_key(), $project_id, $filter);
+}
+
 sub _create_story($story_opts)
 {
     my $project_id = delete $story_opts->{'project_id'};
@@ -315,6 +323,15 @@ sub _display_story($story; $options)
     print $story_text;
 }
 
+sub _display_stories($stories; $options)
+{
+    my $num_stories = 0;
+    foreach my $story (@$stories) {
+        print "=" x 50 . "\n\n" if $num_stories++ >= 1;
+        _display_story($story, $options);
+    }
+}
+
 sub _response_was_successful($response)
 {
     return $response->{'success'} eq "true";
@@ -345,7 +362,7 @@ sub _main()
     if (exists $opts->{'list_projects'}) {
         print _named_projects_string();
     }
-    if (exists $opts->{'show_project'}) {
+    elsif (exists $opts->{'show_project'}) {
         my $result = _get_project_details($project_id);
 
         if (_response_was_successful($result)) {
@@ -357,7 +374,7 @@ sub _main()
             exit 1;
         }
     }
-    if (exists $opts->{'show_story'}) {
+    elsif (exists $opts->{'show_story'}) {
         unless (exists $opts->{'story_id'} || exists $opts->{'all_stories'}) {
             print STDERR "Missing --story-id <id> or --all-stories.\n";
             exit 1;
@@ -368,11 +385,7 @@ sub _main()
             $result = _get_all_stories($project_id);
 
             if (_response_was_successful($result)) {
-                my $stories = 0;
-                foreach my $story (@{$result->{'stories'}}) {
-                    print "=" x 50 . "\n\n" if $stories++ >= 1;
-                    _display_story($story, { show_notes => $opts->{'show_notes'} });
-                }
+                _display_stories($result->{'stories'}, { show_notes => $opts->{'show_notes'} });
                 exit 0;
             }
         }
@@ -383,6 +396,18 @@ sub _main()
                 _display_story($result, { show_notes => $opts->{'show_notes'} });
                 exit 0;
             }
+        }
+
+        _display_error($result);
+        exit 1;
+    }
+    elsif (exists $opts->{'search'}) {
+        my $result = _stories_for_filter($project_id, $opts->{'search'});
+
+        if (_response_was_successful($result)) {
+            print $result->{'message'} . ":\n\n";
+            _display_stories($result->{'stories'}, { show_notes => $opts->{'show_notes'} });
+            exit 0;
         }
 
         _display_error($result);
