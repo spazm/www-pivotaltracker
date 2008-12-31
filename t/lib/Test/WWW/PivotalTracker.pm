@@ -8,6 +8,7 @@ use base qw(Test::Class);
 use Sub::Override;
 use Test::Most;
 
+#{{{ sub make_fixture
 sub make_fixture : Test(setup => 1)
 {
     my $self = shift;
@@ -20,7 +21,9 @@ sub make_fixture : Test(setup => 1)
         }
     );
 }
+#}}}
 
+#{{{ sub TEST__IS_ONE_OF
 sub TEST__IS_ONE_OF : Test(4)
 {
     is(
@@ -47,7 +50,9 @@ sub TEST__IS_ONE_OF : Test(4)
         "Doesn't find element, even if there's more than one element in the list.",
     );
 }
+#}}}
 
+#{{{ sub TEST__CHECK_PROJECT_ID
 sub TEST__CHECK_PROJECT_ID : Test(3)
 {
     is(
@@ -68,7 +73,9 @@ sub TEST__CHECK_PROJECT_ID : Test(3)
         "'a' is not a valid project id",
     );
 }
+#}}}
 
+#{{{ sub TEST__CHECK_STORY_ID
 sub TEST__CHECK_STORY_ID : Test(3)
 {
     is(
@@ -89,7 +96,9 @@ sub TEST__CHECK_STORY_ID : Test(3)
         "'a' is not a valid story id",
     );
 }
+#}}}
 
+#{{{ sub TEST__DO_REQUEST__ARRAYIFIES_ELEMENTS_THAT_COULD_APPEAR_MORE_THAN_ONCE
 sub TEST__DO_REQUEST__ARRAYIFIES_ELEMENTS_THAT_COULD_APPEAR_MORE_THAN_ONCE : Test(4)
 {
     my $self = shift;
@@ -149,7 +158,9 @@ sub TEST__DO_REQUEST__ARRAYIFIES_ELEMENTS_THAT_COULD_APPEAR_MORE_THAN_ONCE : Tes
         '$response->{story}->[0]->{labels}->{label}',
     );
 }
+#}}}
 
+#{{{ sub TEST__SANITIZE_STORY_XML
 sub TEST__SANITIZE_STORY_XML : Test(4)
 {
     my $self = shift;
@@ -250,7 +261,9 @@ sub TEST__SANITIZE_STORY_XML : Test(4)
         '$sanitized_response ok',
     );
 }
+#}}}
 
+#{{{ sub TEST_PROJECT_DETAILS__BASE_CASE
 sub TEST_PROJECT_DETAILS__BASE_CASE : Test(3)
 {
     my $self = shift;
@@ -289,7 +302,9 @@ sub TEST_PROJECT_DETAILS__BASE_CASE : Test(3)
         "project_details response ok"
     );
 }
+#}}}
 
+#{{{ sub TEST_PROJECT_DETAILS__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE
 sub TEST_PROJECT_DETAILS__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE : Test(3)
 {
     my $self = shift;
@@ -324,7 +339,9 @@ sub TEST_PROJECT_DETAILS__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE : Test(3)
         "project_details response ok"
     );
 }
+#}}}
 
+#{{{ sub TEST_SHOW_STORY__BASE_CASE
 sub TEST_SHOW_STORY__BASE_CASE : Test(3)
 {
     my $self = shift;
@@ -392,7 +409,9 @@ sub TEST_SHOW_STORY__BASE_CASE : Test(3)
         'show_story ok',
     );
 }
+#}}}
 
+#{{{ sub TEST_SHOW_STORY__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE
 sub TEST_SHOW_STORY__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE : Test(3)
 {
     my $self = shift;
@@ -424,7 +443,9 @@ sub TEST_SHOW_STORY__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE : Test(3)
         'show_story ok',
     );
 }
+#}}}
 
+#{{{ sub TEST_ALL_STORIES_BASE_CASE
 sub TEST_ALL_STORIES_BASE_CASE : Test(3)
 {
     my $self = shift;
@@ -540,7 +561,9 @@ sub TEST_ALL_STORIES_BASE_CASE : Test(3)
         'all_stories ok',
     );
 }
+#}}}
 
+#{{{ sub TEST_ALL_STORIES__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE
 sub TEST_ALL_STORIES__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE : Test(3)
 {
     my $self = shift;
@@ -572,13 +595,16 @@ sub TEST_ALL_STORIES__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE : Test(3)
         'show_story ok',
     );
 }
+#}}}
 
+#{{{ sub teardown
 sub teardown : Test(teardown)
 {
     my $self = shift;
 
     $self->{'override'} = undef;
-};
+}
+#}}}
 
 1;
 
@@ -628,4 +654,4 @@ __END__
   </stories>
 </response>
 
-# vim: set tabstop=4 shiftwidth=4:
+# vim: set tabstop=4 shiftwidth=4 fdm=marker:
