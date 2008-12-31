@@ -30,7 +30,11 @@ Version 0.1.0_5
 
 =cut
 
-our $VERSION = "0.10_05";
+<<<<<<< HEAD:lib/WWW/PivotalTracker.pm
+use version; our $VERSION = qv("0.10_05");
+=======
+our $VERSION = "0.11";
+>>>>>>> a6e9d65... Minor tweaks necessary for using ShipIt.:lib/WWW/PivotalTracker.pm
 
 =head1 SYNOPSIS
 

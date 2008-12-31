@@ -10,3 +10,4 @@ blib
 pm_to_lib
 .*\.swp$
 WWW-PivotalTracker-.*
+\.shipit$

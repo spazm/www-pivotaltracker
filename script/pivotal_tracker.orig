@@ -125,7 +125,11 @@ Many flags aren't implemented yet, and are merely placeholders at this point.
 
 =cut
 
-our $VERSION = "0.1.0_5";
+<<<<<<< HEAD:script/pivotal_tracker
+use version; our $VERSION = qv("0.1.0_5");
+=======
+our $VERSION = "0.11";
+>>>>>>> a6e9d65... Minor tweaks necessary for using ShipIt.:script/pivotal_tracker
 
 my $options_format = "usage: %c %o";
 my @options = (

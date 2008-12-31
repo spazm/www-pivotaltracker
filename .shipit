@@ -1,0 +1,7 @@
+# auto-generated shipit config file.
+steps = FindVersion, ChangeVersion, CheckChangeLog, DistTest, Commit, Tag, MakeDist
+
+git.tagpattern = v%v
+git.push_to = perlninja
+
+CheckChangeLog.files = ChangeLog

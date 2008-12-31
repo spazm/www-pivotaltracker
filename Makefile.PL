@@ -17,7 +17,6 @@ requires 'LWP::UserAgent';
 requires 'parent';
 requires 'Perl6::Parameters';
 requires 'Pod::Usage';
-requires 'version';
 requires 'XML::Simple';
 
 test_requires 'Sub::Override';
@@ -25,6 +24,6 @@ test_requires 'Test::Class';
 test_requires 'Test::More';
 test_requires 'Test::Most';
 
-install_script 'script/pivotal_tracker';
+install_script 'pivotal_tracker';
 
 WriteAll;
