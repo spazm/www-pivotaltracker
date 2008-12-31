@@ -1,5 +1,10 @@
 Revision history for Perl extension WWW-PivotalTracker
 
+0.12  Wed, 31 Dec 2008 19:46:17 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Remove crufty .orig files
+     - Add Vim fold markers to test module.
+     - Implement stories_for_filter
+
 0.11  Wed, 31 Dec 2008 18:05:28 -0000 (Jacob Helwig <jhelwig@cpan.org>)
      - Fix capitalization of test_requires for Sub::Override
      - Update Changes file, and add Test::CheckChanges test.

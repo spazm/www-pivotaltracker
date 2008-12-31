@@ -4,6 +4,14 @@ global:
 releases:
   - author: 'Jacob Helwig <jhelwig@cpan.org>'
     changes:
+      - Remove crufty .orig files
+      - Add Vim fold markers to test module.
+      - Implement stories_for_filter
+    date: 2008-12-31T19:46:17Z
+    tags: []
+    version: 0.12
+  - author: 'Jacob Helwig <jhelwig@cpan.org>'
+    changes:
       - Fix capitalization of test_requires for Sub::Override
       - 'Update Changes file, and add Test::CheckChanges test.'
       - Maintain Changes file using Module::Changes and Changes.yml

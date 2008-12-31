@@ -123,7 +123,7 @@ Many flags aren't implemented yet, and are merely placeholders at this point.
 
 =cut
 
-our $VERSION = "0.11";
+our $VERSION = "0.12";
 
 my $options_format = "usage: %c %o";
 my @options = (
