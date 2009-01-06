@@ -299,7 +299,7 @@ sub delete_story($token, $project_id, $story_id)
 
 =head2 stories_for_filter
 
-Find all stories given search paremeters.
+Find all stories given search parameters.
 
     my $result = stories_for_filter($token, $project_id, $search_filter);
 
@@ -313,7 +313,7 @@ Find all stories given search paremeters.
         print $result->{'errors'};
     }
 
-In the example above C<< @stories >> will be an array of story hashrefs.  See the description of B<show_story> for the details of the hashrefs.
+In the example above C<< @stories >> will be an array of story hashrefs.  See the description of C<show_story> for the details of the hashrefs.
 
 Any multi-word terms in the search filter must be enclosed by double quotes.
 
