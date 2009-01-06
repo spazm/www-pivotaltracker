@@ -153,7 +153,7 @@ sub show_story($token, $project_id, $story_id)
     my $story = __PACKAGE__->_sanitize_story_xml($response->{'story'}->[0]);
 
     return {
-        success       => 'true',
+        success => 'true',
         %{$story},
     };
 }
