@@ -87,7 +87,8 @@ iteration, and which day of the week the iterations start on.
 
 =cut
 
-sub project_details($token, $project_id) {
+sub project_details($token, $project_id)
+{
     croak("Malformed Project ID: '$project_id'") unless __PACKAGE__->_check_project_id($project_id);
 
     my $response = __PACKAGE__->_do_request($token, "projects/$project_id", "GET");
