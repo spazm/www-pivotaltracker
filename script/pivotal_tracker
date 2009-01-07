@@ -258,7 +258,7 @@ sub _delete_story($project_id, $story_id)
 sub _display_error($result)
 {
     print STDERR "Unable to process request:\n";
-    printf STDERR ("  %s\n", $_) foreach $result->{'errors'};
+    printf STDERR ("  %s\n", $_) foreach @{$result->{'errors'}};
 }
 
 sub _display_project($project)
