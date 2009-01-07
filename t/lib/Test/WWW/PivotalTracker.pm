@@ -249,6 +249,7 @@ sub TEST__SANITIZE_STORY_XML : Test(4)
             labels        => [ 'needs feedback', ],
             name          => 'Release 1',
             requested_by  => 'Jacob Helwig',
+            owned_by      => undef,
             story_type    => 'release',
             url           => 'https://www.pivotaltracker.com/story/show/320532',
             notes => [{
@@ -397,6 +398,7 @@ sub TEST_SHOW_STORY__BASE_CASE : Test(3)
             labels        => [ 'needs feedback', ],
             name          => 'Release 1',
             requested_by  => 'Jacob Helwig',
+            owned_by      => undef,
             story_type    => 'release',
             url           => 'https://www.pivotaltracker.com/story/show/320532',
             notes => [{
@@ -523,6 +525,7 @@ sub TEST_ALL_STORIES__BASE_CASE : Test(3)
                   labels        => undef,
                   name          => 'Release 1',
                   requested_by  => 'Jacob Helwig',
+                  owned_by      => undef,
                   story_type    => 'release',
                   url           => 'https://www.pivotaltracker.com/story/show/320532',
                   notes => [
@@ -550,6 +553,7 @@ sub TEST_ALL_STORIES__BASE_CASE : Test(3)
                   name          => 'Story!',
                   notes         => undef,
                   requested_by  => 'Jacob Helwig',
+                  owned_by      => undef,
                   story_type    => 'feature',
                   url           => 'https://www.pivotaltracker.com/story/show/320008',
                   labels => [
@@ -702,6 +706,7 @@ sub TEST_STORIES_FOR_FILTER__SANITIZES_STORY_XML : Test(3)
                   labels        => undef,
                   name          => 'Release 1',
                   requested_by  => 'Jacob Helwig',
+                  owned_by      => undef,
                   story_type    => 'release',
                   url           => 'https://www.pivotaltracker.com/story/show/320532',
                   notes => [
@@ -729,6 +734,7 @@ sub TEST_STORIES_FOR_FILTER__SANITIZES_STORY_XML : Test(3)
                   name          => 'Story!',
                   notes         => undef,
                   requested_by  => 'Jacob Helwig',
+                  owned_by      => undef,
                   story_type    => 'feature',
                   url           => 'https://www.pivotaltracker.com/story/show/320008',
                   labels => [

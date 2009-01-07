@@ -55,6 +55,7 @@ pivotal_tracker [options]
  Story Attributes:
    -S --story            Story title to create
    -b --requested-by     Who requested the story
+   -o --owned-by         Who is responsible for working on the story
    -l --label            Label to apply (May appear more than once, or be a single comma separated list
    -e --estimate         Point estimate for story
    -C --created-at       Date/Time story was created (Defaults to 'now')
@@ -155,6 +156,7 @@ my @options = (
     [ 'Story Attributes:',                                                     ],
     [ 'story|S=s'        => 'Story title to create',                           ],
     [ 'requested-by|b=s' => 'Who requested the story',                         ],
+    [ 'owned_by|o=s'     => 'Who is responsible for working on the story',     ],
     [ 'label|l=s@'       => 'Label to apply (May appear more than once, or be a single comma separated list', ],
     [ 'estimate|e=s'     => "Point estimate for story",                        ],
     [ 'created-at|C=s'   => "Date/Time story was created (Defaults to 'now')", ],
@@ -289,8 +291,12 @@ sub _display_story($story; $options)
           sprintf("    Description: %s\n", $story->{'description'})
             if defined $story->{'description'};
     $story_text .=
-          sprintf("   Requested By: %s\n", $story->{'requested_by'})
-        . sprintf("        Created: %s\n", $story->{'created_at'});
+          sprintf("   Requested By: %s\n", $story->{'requested_by'});
+    $story_text .=
+          sprintf("       Owned By: %s\n", $story->{'owned_by'})
+            if defined $story->{'owned_by'};
+    $story_text .=
+          sprintf("        Created: %s\n", $story->{'created_at'});
     $story_text .=
           sprintf("       Deadline: %s\n", $story->{'deadline'})
             if defined $story->{'deadline'};

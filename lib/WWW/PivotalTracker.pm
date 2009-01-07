@@ -388,6 +388,7 @@ sub _sanitize_story_xml($class, $story)
         deadline      => $story->{'deadline'},
         story_type    => $story->{'story_type'},
         requested_by  => $story->{'requested_by'},
+        owned_by      => $story->{'owned_by'},
         labels        => $labels,
         notes         => $notes,
         url           => $story->{'url'},
