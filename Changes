@@ -4,6 +4,20 @@ global:
 releases:
   - author: 'Jacob Helwig <jhelwig@cpan.org>'
     changes:
+      - Fix code style for project_details declaration
+      - Tweak POD for stories_for_filter
+      - Fix code formatting
+      - Flesh-out examples for stories_for_filter
+      - Simplify _create_story
+      - Fix broken _display_error in pivotal_tracker script
+      - Make sure a Story ID is given to pivotal_tracker when deleting
+      - 'Add "Owned By" flag, and story output'
+      - Implement ability to update existing stories
+    date: 2009-01-07T04:34:01Z
+    tags: []
+    version: 0.13
+  - author: 'Jacob Helwig <jhelwig@cpan.org>'
+    changes:
       - Remove crufty .orig files
       - Add Vim fold markers to test module.
       - Implement stories_for_filter

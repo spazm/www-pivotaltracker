@@ -1,5 +1,16 @@
 Revision history for Perl extension WWW-PivotalTracker
 
+0.13  Wed, 07 Jan 2009 04:34:01 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Fix code style for project_details declaration
+     - Tweak POD for stories_for_filter
+     - Fix code formatting
+     - Flesh-out examples for stories_for_filter
+     - Simplify _create_story
+     - Fix broken _display_error in pivotal_tracker script
+     - Make sure a Story ID is given to pivotal_tracker when deleting
+     - Add "Owned By" flag, and story output
+     - Implement ability to update existing stories
+
 0.12  Wed, 31 Dec 2008 19:46:17 -0000 (Jacob Helwig <jhelwig@cpan.org>)
      - Remove crufty .orig files
      - Add Vim fold markers to test module.
