@@ -315,10 +315,14 @@ Find all stories given search parameters.
 
 In the example above C<< @stories >> will be an array of story hashrefs.  See the description of C<show_story> for the details of the hashrefs.
 
-Any multi-word terms in the search filter must be enclosed by double quotes.
+Any multi-word terms in the search filter must be enclosed by double quotes. (See L<http://www.pivotaltracker.com/help>: Search)
 
     Example:
-        requested_by:"Jacob Helwig"
+        requeser:"Jacob Helwig"
+        owner:"Jacob Helwig"
+        mywork:"Jacob Helwig"
+        state:unstarted
+        type:Feature
 
 =cut
 
