@@ -245,13 +245,9 @@ sub _stories_for_filter($project_id, $filter)
     return stories_for_filter(_api_key(), $project_id, $filter);
 }
 
-sub _create_story($story_opts)
+sub _create_story($project_id, $story_opts)
 {
-    my $project_id = delete $story_opts->{'project_id'};
-
-    my $response = add_story(_api_key(), $project_id, $story_opts);
-
-    return $response;
+    return add_story(_api_key(), $project_id, $story_opts);
 }
 
 sub _delete_story($project_id, $story_id)
@@ -414,17 +410,19 @@ sub _main()
         exit 1;
     }
     elsif (exists $opts->{'add_story'}) {
-        my $result = _create_story({
-            project_id    => $project_id,
-            name          => $opts->{'story'},
-            requested_by  => ($opts->{'requested_by'} || $cfg->{'General'}->{'Me'}),
-            labels        => (exists $opts->{'label'} ? join(",", @{$opts->{'label'}}) : undef),
-            estimate      => $opts->{'estimate'},
-            created_at    => $opts->{'created_at'},
-            deadline      => $opts->{'deadline'},
-            story_type    => $opts->{'story_type'},
-            current_state => $opts->{'state'},
-        });
+        my $result = _create_story(
+            $project_id,
+            {
+                name          => $opts->{'story'},
+                requested_by  => ($opts->{'requested_by'} || $cfg->{'General'}->{'Me'}),
+                labels        => (exists $opts->{'label'} ? join(",", @{$opts->{'label'}}) : undef),
+                estimate      => $opts->{'estimate'},
+                created_at    => $opts->{'created_at'},
+                deadline      => $opts->{'deadline'},
+                story_type    => $opts->{'story_type'},
+                current_state => $opts->{'state'},
+            }
+        );
 
         if (_response_was_successful($result)) {
             _display_story($result);
