@@ -15,6 +15,7 @@ use WWW::PivotalTracker qw/
     project_details
     show_story
     stories_for_filter
+    update_story
 /;
 
 use aliased 'Config::Any' => 'Config';
@@ -252,6 +253,11 @@ sub _create_story($project_id, $story_opts)
     return add_story(_api_key(), $project_id, $story_opts);
 }
 
+sub _update_story($project_id, $story_id, $story_opts)
+{
+    return update_story(_api_key(), $project_id, $story_id, $story_opts);
+}
+
 sub _delete_story($project_id, $story_id)
 {
     return delete_story(_api_key(), $project_id, $story_id);
@@ -428,6 +434,47 @@ sub _main()
                 story_type    => $opts->{'story_type'},
                 current_state => $opts->{'state'},
             }
+        );
+
+        if (_response_was_successful($result)) {
+            _display_story($result);
+            exit 0;
+        }
+        else {
+            _display_error($result);
+            exit 1;
+        }
+    }
+    elsif (exists $opts->{'update_story'}) {
+        unless (exists $opts->{'story_id'}) {
+            print STDERR "Must specify a Story ID to update.\n";
+            exit 1;
+        }
+
+        my %story_details = ();
+
+        %story_details = map { $_ => $opts->{$_} }
+            grep { exists $opts->{$_} } qw/
+                created_at
+                deadline
+                estimate
+                owned_by
+                requested_by
+                story_type
+            /;
+        $story_details{'name'} = $opts->{'story'} if exists $opts->{'story'};
+        $story_details{'labels'} = join(",", @{$opts->{'label'}}) if exists $opts->{'label'};
+        $story_details{'current_state'} = $opts->{'state'} if exists $opts->{'state'};
+
+        unless (scalar keys %story_details) {
+            print STDERR "Cannot update a story, without specifying what to update.\n";
+            exit 1;
+        }
+
+        my $result = _update_story(
+            $project_id,
+            $opts->{'story_id'},
+            { %story_details },
         );
 
         if (_response_was_successful($result)) {

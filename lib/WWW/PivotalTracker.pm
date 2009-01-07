@@ -42,6 +42,7 @@ This module provides simple methods to interact with the Pivotal Tracker API.
         project_details
         show_story
         stories_for_filter
+        update_story
     /;
 
     my $details = project_details("API Token", "Project ID");
@@ -61,6 +62,7 @@ our @EXPORT_OK = qw/
     project_details
     show_story
     stories_for_filter
+    update_story
 /;
 
 #This should never contain anything.  It's just here to make sure that :all
@@ -345,6 +347,57 @@ sub stories_for_filter($token, $project_id, $search_filter)
         success => 'true',
         message => $response->{'message'},
         stories => [ @stories ],
+    };
+}
+
+=head2 update_story
+
+Update aspects of a given story.
+
+    my $result = update_story($token, $project_id, $story_id, { current_state => 'started' });
+
+See the description of C<show_story> for the details of C<$result>.
+
+=cut
+
+sub update_story($token, $project_id, $story_id, $story_details)
+{
+    croak("Malformed Project ID: '$project_id'") unless __PACKAGE__->_check_project_id($project_id);
+    croak("Malformed Story ID: '$story_id'") unless __PACKAGE__->_check_story_id($story_id);
+
+    foreach my $key (keys %$story_details) {
+        croak("Unrecognized option: $key")
+            unless __PACKAGE__->_is_one_of($key, [qw/
+                created_at
+                current_state
+                deadline
+                description
+                estimate
+                labels
+                name
+                note
+                owned_by
+                requested_by
+                story_type
+            /]);
+    }
+
+    my $content = __PACKAGE__->_make_xml({ story => $story_details });
+
+    my $response = __PACKAGE__->_do_request($token, "projects/$project_id/stories/$story_id", "PUT", $content);
+
+    if (!defined $response || $response->{'success'} ne 'true') {
+        return {
+            success => 'false',
+            errors  => $response->{'errors'},
+        };
+    }
+
+    my $story = __PACKAGE__->_sanitize_story_xml($response->{'story'}->[0]);
+
+    return {
+        success => 'true',
+        %{$story},
     };
 }
 

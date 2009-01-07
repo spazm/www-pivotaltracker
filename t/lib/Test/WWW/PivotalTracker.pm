@@ -748,6 +748,113 @@ sub TEST_STORIES_FOR_FILTER__SANITIZES_STORY_XML : Test(3)
 }
 #}}}
 
+#{{{ sub TEST_UPDATE_STORY__BASE_CASE
+sub TEST_UPDATE_STORY__BASE_CASE : Test(3)
+{
+    my $self = shift;
+
+    my $request_content;
+
+    $self->{'override'}->replace(
+        'WWW::PivotalTracker::_post_request' => sub($$) {
+            return <<"            HERE";
+<?xml version="1.0" encoding="UTF-8"?>
+<response success="true">
+  <story>
+    <id type="integer">320532</id>
+    <story_type>release</story_type>
+    <url>https://www.pivotaltracker.com/story/show/320532</url>
+    <estimate type="integer">-1</estimate>
+    <current_state>unscheduled</current_state>
+    <description></description>
+    <name>Release 1</name>
+    <requested_by>Jacob Helwig</requested_by>
+    <created_at>Dec 20, 2008</created_at>
+    <deadline>Dec 31, 2008</deadline>
+    <notes type="array">
+      <note>
+        <id type="integer">209033</id>
+        <text>Comment!</text>
+        <author>Jacob Helwig</author>
+        <date>Dec 20, 2008</date>
+      </note>
+    </notes>
+    <labels type="array">
+      <label>needs feedback</label>
+    </labels>
+  </story>
+</response>
+            HERE
+        }
+    );
+
+    use_ok('WWW::PivotalTracker', qw/ show_story /);
+
+    my $response = show_story('c0ffe', 1, 320532);
+    isa_ok($response, 'HASH', 'show_story return value');
+
+    eq_or_diff(
+        $response,
+        {
+            success       => 'true',
+            created_at    => 'Dec 20, 2008',
+            current_state => 'unscheduled',
+            deadline      => 'Dec 31, 2008',
+            description   => undef,
+            estimate      => '-1',
+            id            => '320532',
+            labels        => [ 'needs feedback', ],
+            name          => 'Release 1',
+            requested_by  => 'Jacob Helwig',
+            owned_by      => undef,
+            story_type    => 'release',
+            url           => 'https://www.pivotaltracker.com/story/show/320532',
+            notes => [{
+                author => 'Jacob Helwig',
+                date   => 'Dec 20, 2008',
+                id     => '209033',
+                text   => 'Comment!',
+            }],
+        },
+        'show_story ok',
+    );
+}
+#}}}
+
+#{{{ sub TEST_UPDATE_STORY__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE
+sub TEST_UPDATE_STORY__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE : Test(3)
+{
+    my $self = shift;
+
+    $self->{'override'}->replace(
+        'WWW::PivotalTracker::_post_request' => sub($$) {
+            return <<"            HERE";
+<?xml version="1.0" encoding="UTF-8"?>
+<response success="false">
+  <errors>
+    <error>No API access allowed</error>
+  </errors>
+</response>
+            HERE
+        }
+    );
+
+    use_ok('WWW::PivotalTracker', qw/ update_story /);
+
+    my $response = update_story('c0ffe', 1, 320532);
+    isa_ok($response, 'HASH', 'update_story return value');
+
+    eq_or_diff(
+        $response,
+        {
+            success => 'false',
+            errors  => [ 'No API access allowed', ],
+        },
+        'update_story ok',
+    );
+}
+#}}}
+
 #{{{ sub teardown
 sub teardown : Test(teardown)
 {
