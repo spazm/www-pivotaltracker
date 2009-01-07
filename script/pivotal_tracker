@@ -434,6 +434,11 @@ sub _main()
         }
     }
     elsif (exists $opts->{'delete_story'}) {
+        unless (exists $opts->{'story_id'}) {
+            print STDERR "Must specify a Story ID to update.\n";
+            exit 1;
+        }
+
         my $result = _delete_story($project_id, $opts->{'story_id'});
 
         if (_response_was_successful($result)) {
