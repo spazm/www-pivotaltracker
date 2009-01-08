@@ -55,12 +55,13 @@ pivotal_tracker [options]
 
  Story Attributes:
    -S --story            Story title to create
+   -d --description      Story description
    -b --requested-by     Who requested the story
    -o --owned-by         Who is responsible for working on the story
    -l --label            Label to apply (May appear more than once, or be a single comma separated list
    -e --estimate         Point estimate for story
    -C --created-at       Date/Time story was created (Defaults to 'now')
-   -d --deadline         Deadline of the story (Only applicable to 'release' story type)
+      --deadline         Deadline of the story (Only applicable to 'release' story type)
 
  Story Type Options:
    --feature             Set story type to 'feature' (Default for new stories)
@@ -156,12 +157,13 @@ my @options = (
     [                                                                          ],
     [ 'Story Attributes:',                                                     ],
     [ 'story|S=s'        => 'Story title to create',                           ],
+    [ 'description|d=s'  => 'Story description',                               ],
     [ 'requested-by|b=s' => 'Who requested the story',                         ],
     [ 'owned_by|o=s'     => 'Who is responsible for working on the story',     ],
     [ 'label|l=s@'       => 'Label to apply (May appear more than once, or be a single comma separated list', ],
     [ 'estimate|e=s'     => "Point estimate for story",                        ],
     [ 'created-at|C=s'   => "Date/Time story was created (Defaults to 'now')", ],
-    [ 'deadline|d=s'     => "Deadline of the story (Only applicable to 'release' story type)", ],
+    [ 'deadline=s'       => "Deadline of the story (Only applicable to 'release' story type)", ],
     [                                                                          ],
     [ 'Story Type Options:',                                                   ],
     [ 'story-type=s'   => [
@@ -426,6 +428,7 @@ sub _main()
             $project_id,
             {
                 name          => $opts->{'story'},
+                description   => $opts->{'description'},
                 requested_by  => ($opts->{'requested_by'} || $cfg->{'General'}->{'Me'}),
                 labels        => (exists $opts->{'label'} ? join(",", @{$opts->{'label'}}) : undef),
                 estimate      => $opts->{'estimate'},
@@ -457,6 +460,7 @@ sub _main()
             grep { exists $opts->{$_} } qw/
                 created_at
                 deadline
+                description
                 estimate
                 owned_by
                 requested_by
