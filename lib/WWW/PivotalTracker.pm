@@ -36,6 +36,7 @@ our $VERSION = "0.13";
 This module provides simple methods to interact with the Pivotal Tracker API.
 
     use WWW::PivotalTracker qw/
+        add_note
         add_story
         all_stories
         delete_story
@@ -56,6 +57,7 @@ Nothing is exported by default.  See B<FUNCTIONS> for the exportable functions.
 =cut
 
 our @EXPORT_OK = qw/
+    add_note
     add_story
     all_stories
     delete_story
@@ -401,6 +403,43 @@ sub update_story($token, $project_id, $story_id, $story_details)
     };
 }
 
+=head2 add_note
+
+Add a note to an existing story.
+
+    my $result = add_comment($token, $project_id, $story_id, $note);
+
+See the description of C<show_story> for the details of C<$result>.
+
+=cut
+
+sub add_note($token, $project_id, $story_id, $note)
+{
+    croak("Malformed Project ID: '$project_id'") unless __PACKAGE__->_check_project_id($project_id);
+    croak("Malformed Story ID: '$story_id'") unless __PACKAGE__->_check_story_id($story_id);
+
+    my $response = __PACKAGE__->_do_request(
+        $token,
+        "projects/$project_id/stories/$story_id/notes",
+        "POST",
+        __PACKAGE__->_make_xml({ note => { text => $note } })
+    );
+
+    if (!defined $response || $response->{'success'} ne 'true') {
+        return {
+            success => 'false',
+            errors  => $response->{'errors'},
+        };
+    }
+
+    my $new_note = __PACKAGE__->_sanitize_note_xml($response->{'note'}->[0]);
+
+    return {
+        success => 'true',
+        %{$new_note},
+    };
+}
+
 sub _check_story_id($class, $story_id)
 {
     return $story_id =~ m/^\d+$/ ? 1 : 0;
@@ -446,6 +485,17 @@ sub _sanitize_story_xml($class, $story)
         notes         => $notes,
         url           => $story->{'url'},
     };
+}
+
+sub _sanitize_note_xml($class, $note)
+{
+    return {
+        id     => $note->{'id'}->{'content'},
+        author => $note->{'author'},
+        date   => $note->{'date'},
+        text   => $note->{'text'},
+    };
+    return $note;
 }
 
 sub _do_request($class, $token, $request_url, $request_method; $content)

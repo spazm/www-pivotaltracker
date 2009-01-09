@@ -9,6 +9,7 @@ use Getopt::Long::Descriptive qw/ :all      /;
 use Hash::Merge               qw/ merge     /;
 use Pod::Usage                qw/ pod2usage /;
 use WWW::PivotalTracker qw/
+    add_note
     add_story
     all_stories
     delete_story
@@ -47,6 +48,7 @@ pivotal_tracker [options]
       --search <filter>  Search for stories given a filter
    -c --comment          Comment on story
    -u --update-story     Update the details of a story
+      --add-note <note>  Add a note to an existing story
       --deliver-all      Deliver all deliverable stories
 
  Story Display Options:
@@ -149,6 +151,7 @@ my @options = (
     [ 'search=s'       => 'Search for stories given a filter',                 ],
     [ 'update-story|u' => 'Update the details of a story',                     ],
     [ 'comment|c'      => 'Comment on story',                                  ],
+    [ 'add-note=s'     => 'Add a note to an existing story',                   ],
     [ 'deliver-all'    => 'Deliver all deliverable stories',                   ],
     [                                                                          ],
     [ ' Story Display Options:',                                               ],
@@ -265,6 +268,11 @@ sub _delete_story($project_id, $story_id)
     return delete_story(_api_key(), $project_id, $story_id);
 }
 
+sub _add_note($project_id, $story_id, $note)
+{
+    return add_note(_api_key(), $project_id, $story_id, $note);
+}
+
 sub _display_error($result)
 {
     print STDERR "Unable to process request:\n";
@@ -345,6 +353,14 @@ sub _display_stories($stories; $options)
         print "=" x 50 . "\n\n" if $num_stories++ >= 1;
         _display_story($story, $options);
     }
+}
+
+sub _display_note($note)
+{
+    my $note_text = sprintf("Note (%s) %s @ %s:\n", $note->{'id'}, $note->{'author'}, $note->{'date'});
+    $note_text .= sprintf("    %s\n", $_) foreach split("\n", $note->{'text'});
+
+    print $note_text;
 }
 
 sub _response_was_successful($response)
@@ -505,6 +521,23 @@ sub _main()
 
         if (_response_was_successful($result)) {
             print $result->{'message'} . "\n";
+            exit 0;
+        }
+        else {
+            _display_error($result);
+            exit 1;
+        }
+    }
+    elsif (exists $opts->{'add_note'}) {
+        unless (exists $opts->{'story_id'}) {
+            print STDERR "Must specify a Story ID to add a note.\n";
+            exit 1;
+        }
+
+        my $result = _add_note($project_id, $opts->{'story_id'}, $opts->{'add_note'});
+
+        if (_response_was_successful($result)) {
+            _display_note($result);
             exit 0;
         }
         else {
