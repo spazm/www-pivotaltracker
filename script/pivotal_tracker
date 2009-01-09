@@ -295,9 +295,14 @@ sub _display_story($story; $options)
         . sprintf("           Name: %s\n", $story->{'name'})
         . sprintf("       Estimate: %s\n", $story->{'estimate'})
         . sprintf("          State: %s\n", $story->{'current_state'});
-    $story_text .=
-          sprintf("    Description: %s\n", $story->{'description'})
-            if defined $story->{'description'};
+
+    if (defined $story->{'description'}) {
+        my @description_lines = split("\n", $story->{'description'});
+
+        $story_text .= sprintf("    Description: %s\n", shift @description_lines);
+        $story_text .= sprintf("                 %s\n", $_) foreach @description_lines;
+        $story_text .= "\n" if @description_lines;
+    }
     $story_text .=
           sprintf("   Requested By: %s\n", $story->{'requested_by'});
     $story_text .=
