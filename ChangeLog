@@ -1,5 +1,10 @@
 Revision history for Perl extension WWW-PivotalTracker
 
+0.14  Mon, 12 Jan 2009 06:09:53 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Add missing description option to pivotal_tracker
+     - Make the description of stories readable, when it spans multiple lines.
+     - Implement ability to add story notes
+
 0.13  Wed, 07 Jan 2009 04:34:01 -0000 (Jacob Helwig <jhelwig@cpan.org>)
      - Fix code style for project_details declaration
      - Tweak POD for stories_for_filter

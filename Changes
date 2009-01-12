@@ -4,6 +4,14 @@ global:
 releases:
   - author: 'Jacob Helwig <jhelwig@cpan.org>'
     changes:
+      - Add missing description option to pivotal_tracker
+      - 'Make the description of stories readable, when it spans multiple lines.'
+      - Implement ability to add story notes
+    date: 2009-01-12T06:09:53Z
+    tags: []
+    version: 0.14
+  - author: 'Jacob Helwig <jhelwig@cpan.org>'
+    changes:
       - Fix code style for project_details declaration
       - Tweak POD for stories_for_filter
       - Fix code formatting

@@ -29,7 +29,7 @@ WWW::PivotalTracker - Functional interface to Pivotal Tracker L<http://www.pivot
 
 =cut
 
-our $VERSION = "0.13";
+our $VERSION = "0.14";
 
 =head1 SYNOPSIS
 
