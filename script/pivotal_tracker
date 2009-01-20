@@ -386,9 +386,22 @@ sub _main()
     pod2usage(1) if $opts->{'help'};
     pod2usage(-exitstatus => 0, -verbose => 2) if $opts->{'man'};
 
-    my $project_id = exists $opts->{'project_id'}
-        ? $opts->{'project_id'}
-        : $cfg->{'Projects'}->{$cfg->{'General'}->{'DefaultProject'}};
+
+    my $project_id;
+    if (defined(my $project_name = $opts->{'project'})) {
+        $project_id = $cfg->{'Projects'}->{$project_name};
+
+        unless ($project_id) {
+            print STDERR "Invalid Project Name.\n";
+            exit 1;
+        }
+    }
+    elsif (exists $opts->{'project_id'}) {
+        $project_id = $opts->{'project_id'};
+    }
+    else {
+        $project_id = $cfg->{'Projects'}->{$cfg->{'General'}->{'DefaultProject'}};
+    }
 
     if (exists $opts->{'list_projects'}) {
         print _named_projects_string();
