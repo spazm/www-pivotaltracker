@@ -4,6 +4,13 @@ global:
 releases:
   - author: 'Jacob Helwig <jhelwig@cpan.org>'
     changes:
+      - Add support for project name flag
+      - 'Remove vim modeline, and fold markers.'
+    date: 2009-01-22T14:29:30Z
+    tags: []
+    version: 0.15
+  - author: 'Jacob Helwig <jhelwig@cpan.org>'
+    changes:
       - Add missing description option to pivotal_tracker
       - 'Make the description of stories readable, when it spans multiple lines.'
       - Implement ability to add story notes
