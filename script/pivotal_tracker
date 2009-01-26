@@ -296,6 +296,18 @@ sub _display_project($project)
 
 sub _display_story($story; $options)
 {
+    my $story_text;
+    if (exists($options->{'one_line'}) && $options->{'one_line'}) {
+        $story_text = _display_story_one_line($story, $options);
+    }
+    else {
+        $story_text = _display_story_long($story, $options);
+    }
+    print $story_text;
+}
+
+sub _display_story_long($story; $options)
+{
     $options->{'show_notes'} ||= 0;
 
     my $story_text =
@@ -343,14 +355,21 @@ sub _display_story($story; $options)
 
     $story_text .= "\n";
 
-    print $story_text;
+    return $story_text;
+}
+
+sub _display_story_one_line($story; $options)
+{
+    my $story_text = sprintf("Story %s (%s): %s\n", $story->{'id'}, $story->{'story_type'}, $story->{'name'});
+
+    return $story_text;
 }
 
 sub _display_stories($stories; $options)
 {
     my $num_stories = 0;
     foreach my $story (@$stories) {
-        print "=" x 50 . "\n\n" if $num_stories++ >= 1;
+        print "=" x 50 . "\n\n" if $num_stories++ >= 1 && (!$options->{'one_line'});
         _display_story($story, $options);
     }
 }
@@ -429,7 +448,14 @@ sub _main()
             $result = _get_all_stories($project_id);
 
             if (_response_was_successful($result)) {
-                _display_stories($result->{'stories'}, { show_notes => $opts->{'show_notes'} });
+                _display_stories(
+                    $result->{'stories'},
+                    {
+                        show_notes => $opts->{'show_notes'},
+                        one_line   => $opts->{'one_line'},
+                    }
+                );
+
                 exit 0;
             }
         }
@@ -437,7 +463,14 @@ sub _main()
             $result = _get_story($project_id, $opts->{'story_id'});
 
             if (_response_was_successful($result)) {
-                _display_story($result, { show_notes => $opts->{'show_notes'} });
+                _display_story(
+                    $result,
+                    {
+                        show_notes => $opts->{'show_notes'},
+                        one_line   => $opts->{'one_line'},
+                    }
+                );
+
                 exit 0;
             }
         }
