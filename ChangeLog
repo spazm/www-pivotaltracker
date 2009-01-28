@@ -1,5 +1,8 @@
 Revision history for Perl extension WWW-PivotalTracker
 
+0.16  Wed, 28 Jan 2009 08:27:46 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Add ability to show stories one per line
+
 0.15  Thu, 22 Jan 2009 14:29:30 -0000 (Jacob Helwig <jhelwig@cpan.org>)
      - Add support for project name flag
      - Remove vim modeline, and fold markers.
