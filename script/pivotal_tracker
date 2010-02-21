@@ -3,8 +3,6 @@
 use strict;
 use warnings;
 
-use Perl6::Parameters;
-
 use Getopt::Long::Descriptive qw/ :all      /;
 use Hash::Merge               qw/ merge     /;
 use Pod::Usage                qw/ pod2usage /;
@@ -231,56 +229,64 @@ sub _api_key()
     return $cfg->{'General'}->{'APIKey'};
 }
 
-sub _get_project_details($project_id)
+sub _get_project_details($)
 {
-    my $response = project_details(_api_key(), $project_id);
+    my $response = project_details(_api_key(), shift);
 
     return $response;
 }
 
-sub _get_all_stories($project_id)
+sub _get_all_stories($)
 {
-    return all_stories(_api_key(), $project_id);
+    return all_stories(_api_key(), shift);
 }
 
-sub _get_story($project_id, $story_id)
+sub _get_story($$)
 {
+    my ($project_id, $story_id) = @_;
     return show_story(_api_key(), $project_id, $story_id);
 }
 
-sub _stories_for_filter($project_id, $filter)
+sub _stories_for_filter($$)
 {
+    my ($project_id, $filter) = @_;
     return stories_for_filter(_api_key(), $project_id, $filter);
 }
 
-sub _create_story($project_id, $story_opts)
+sub _create_story($$)
 {
+    my ($project_id, $story_opts) = @_;
     return add_story(_api_key(), $project_id, $story_opts);
 }
 
-sub _update_story($project_id, $story_id, $story_opts)
+sub _update_story($$$)
 {
+    my ($project_id, $story_id, $story_opts) = @_;
     return update_story(_api_key(), $project_id, $story_id, $story_opts);
 }
 
-sub _delete_story($project_id, $story_id)
+sub _delete_story($$)
 {
+    my ($project_id, $story_id) = @_;
     return delete_story(_api_key(), $project_id, $story_id);
 }
 
-sub _add_note($project_id, $story_id, $note)
+sub _add_note($$$)
 {
+    my ($project_id, $story_id, $note) = @_;
     return add_note(_api_key(), $project_id, $story_id, $note);
 }
 
-sub _display_error($result)
+sub _display_error($)
 {
+    my ($result) = @_;
     print STDERR "Unable to process request:\n";
     printf STDERR ("  %s\n", $_) foreach @{$result->{'errors'}};
 }
 
-sub _display_project($project)
+sub _display_project($)
 {
+    my ($project) = @_;
     my $project_text =
           sprintf("               Name: %s\n", $project->{'name'})
         . sprintf("        Point Scale: %s\n", $project->{'point_scale'});
@@ -294,8 +300,9 @@ sub _display_project($project)
     print $project_text;
 }
 
-sub _display_story($story; $options)
+sub _display_story($;$)
 {
+    my ($story, $options) = @_;
     my $story_text;
     if (exists($options->{'one_line'}) && $options->{'one_line'}) {
         $story_text = _display_story_one_line($story, $options);
@@ -306,8 +313,9 @@ sub _display_story($story; $options)
     print $story_text;
 }
 
-sub _display_story_long($story; $options)
+sub _display_story_long($;$)
 {
+    my ($story, $options) = @_;
     $options->{'show_notes'} ||= 0;
 
     my $story_text =
@@ -358,15 +366,17 @@ sub _display_story_long($story; $options)
     return $story_text;
 }
 
-sub _display_story_one_line($story; $options)
+sub _display_story_one_line($;$)
 {
+    my ($story, $options) = @_;
     my $story_text = sprintf("Story %s (%s): %s\n", $story->{'id'}, $story->{'story_type'}, $story->{'name'});
 
     return $story_text;
 }
 
-sub _display_stories($stories; $options)
+sub _display_stories($;$)
 {
+    my ($stories, $options) = @_;
     my $num_stories = 0;
     foreach my $story (@$stories) {
         print "=" x 50 . "\n\n" if $num_stories++ >= 1 && (!$options->{'one_line'});
@@ -374,17 +384,18 @@ sub _display_stories($stories; $options)
     }
 }
 
-sub _display_note($note)
+sub _display_note($)
 {
+    my ($note) = @_;
     my $note_text = sprintf("Note (%s) %s @ %s:\n", $note->{'id'}, $note->{'author'}, $note->{'date'});
     $note_text .= sprintf("    %s\n", $_) foreach split("\n", $note->{'text'});
 
     print $note_text;
 }
 
-sub _response_was_successful($response)
+sub _response_was_successful($)
 {
-    return $response->{'success'} eq "true";
+    return shift->{'success'} eq "true";
 }
 
 sub _main()
@@ -594,5 +605,3 @@ sub _main()
 }
 
 _main();
-
-# vim: set tabstop=4 shiftwidth=4: 
