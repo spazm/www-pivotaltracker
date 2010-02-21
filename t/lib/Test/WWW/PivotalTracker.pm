@@ -115,12 +115,10 @@ sub TEST__DO_REQUEST__ARRAYIFIES_ELEMENTS_THAT_COULD_APPEAR_MORE_THAN_ONCE : Tes
         <id type="integer">209033</id>
         <text>Comment!</text>
         <author>Jacob Helwig</author>
-        <date>Dec 20, 2008</date>
+        <noted_at type="datetime">Dec 20, 2008</noted_at>
       </note>
     </notes>
-    <labels type="array">
-      <label>needs feedback</label>
-    </labels>
+    <labels>needs feedback</labels>
   </story>
 </response>
             HERE
@@ -142,12 +140,6 @@ sub TEST__DO_REQUEST__ARRAYIFIES_ELEMENTS_THAT_COULD_APPEAR_MORE_THAN_ONCE : Tes
         'ARRAY',
         '$response->{story}->[0]->{notes}->{note}',
     );
-
-    isa_ok(
-        $response->{'story'}->[0]->{'labels'}->{'label'},
-        'ARRAY',
-        '$response->{story}->[0]->{labels}->{label}',
-    );
 }
 
 sub TEST__SANITIZE_STORY_XML : Test(4)
@@ -158,31 +150,27 @@ sub TEST__SANITIZE_STORY_XML : Test(4)
         'WWW::PivotalTracker::_post_request' => sub($$) {
             return <<"            HERE";
 <?xml version="1.0" encoding="UTF-8"?>
-<response success="true">
-  <story>
-    <id type="integer">320532</id>
-    <story_type>release</story_type>
-    <url>https://www.pivotaltracker.com/story/show/320532</url>
-    <estimate type="integer">-1</estimate>
-    <current_state>unscheduled</current_state>
-    <description></description>
-    <name>Release 1</name>
-    <requested_by>Jacob Helwig</requested_by>
-    <created_at>Dec 20, 2008</created_at>
-    <deadline>Dec 31, 2008</deadline>
-    <notes type="array">
-      <note>
-        <id type="integer">209033</id>
-        <text>Comment!</text>
-        <author>Jacob Helwig</author>
-        <date>Dec 20, 2008</date>
-      </note>
-    </notes>
-    <labels type="array">
-      <label>needs feedback</label>
-    </labels>
-  </story>
-</response>
+<story>
+  <id type="integer">320532</id>
+  <story_type>release</story_type>
+  <url>https://www.pivotaltracker.com/story/show/320532</url>
+  <estimate type="integer">-1</estimate>
+  <current_state>unscheduled</current_state>
+  <description></description>
+  <name>Release 1</name>
+  <requested_by>Jacob Helwig</requested_by>
+  <created_at type="datetime">Dec 20, 2008</created_at>
+  <deadline type="datetime">Dec 31, 2008</deadline>
+  <notes type="array">
+    <note>
+      <id type="integer">209033</id>
+      <text>Comment!</text>
+      <author>Jacob Helwig</author>
+      <noted_at type="datetime">Dec 20, 2008</noted_at>
+    </note>
+  </notes>
+  <labels>needs feedback</labels>
+</story>
             HERE
         }
     );
@@ -193,42 +181,46 @@ sub TEST__SANITIZE_STORY_XML : Test(4)
     eq_or_diff(
         $response,
         {
-            success => 'true',
-            story => [{
-                created_at    => 'Dec 20, 2008',
-                current_state => 'unscheduled',
-                deadline      => 'Dec 31, 2008',
-                description   => undef,
-                estimate      => { type => 'integer', content => '-1', },
-                id            => { type => 'integer', content => '320532', },
-                name          => 'Release 1',
-                requested_by  => 'Jacob Helwig',
-                story_type    => 'release',
-                url           => 'https://www.pivotaltracker.com/story/show/320532',
-                labels => {
-                    type => 'array',
-                    label => [ 'needs feedback', ],
-                },
-                notes => {
-                    type => 'array',
-                    note => [{
-                        author => 'Jacob Helwig',
-                        date   => 'Dec 20, 2008',
-                        id     => { type => 'integer', content => '209033', },
-                        text   => 'Comment!',
-                    }],
-                },
-            }],
+            created_at    => {
+                type    => 'datetime',
+                content => 'Dec 20, 2008',
+            },
+            current_state => 'unscheduled',
+            deadline      => {
+                type    => 'datetime',
+                content => 'Dec 31, 2008',
+            },
+            description   => undef,
+            estimate      => { type => 'integer', content => '-1', },
+            id            => { type => 'integer', content => '320532', },
+            name          => 'Release 1',
+            requested_by  => 'Jacob Helwig',
+            story_type    => 'release',
+            url           => 'https://www.pivotaltracker.com/story/show/320532',
+            labels        => 'needs feedback',
+            notes         => {
+                type => 'array',
+                note => [{
+                    author   => 'Jacob Helwig',
+                    noted_at => {
+                        type    => 'datetime',
+                        content => 'Dec 20, 2008',
+                    },
+                    id       => { type => 'integer', content => '209033', },
+                    text     => 'Comment!',
+                }],
+            },
         },
         '$response ok',
     );
 
-    my $sanitized_response = WWW::PivotalTracker->_sanitize_story_xml($response->{'story'}->[0]);
+    my $sanitized_response = WWW::PivotalTracker->_sanitize_story_xml($response);
     isa_ok($sanitized_response, 'HASH', '_sanitize_story_xml return value');
 
     eq_or_diff(
         $sanitized_response,
         {
+            accepted_at   => undef,
             created_at    => 'Dec 20, 2008',
             current_state => 'unscheduled',
             deadline      => 'Dec 31, 2008',
@@ -260,14 +252,12 @@ sub TEST_PROJECT_DETAILS__BASE_CASE : Test(3)
         'WWW::PivotalTracker::_post_request' => sub($$) {
             return <<"            HERE";
 <?xml version="1.0" encoding="UTF-8"?>
-<response success="true">
-  <project>
-    <name>Sample Project</name>
-    <iteration_length type="integer">2</iteration_length>
-    <week_start_day>Monday</week_start_day>
-    <point_scale>0,1,2,3</point_scale>
-  </project>
-</response>
+<project>
+  <name>Sample Project</name>
+  <iteration_length type="integer">2</iteration_length>
+  <week_start_day>Monday</week_start_day>
+  <point_scale>0,1,2,3</point_scale>
+</project>
             HERE
         }
     );
@@ -296,16 +286,7 @@ sub TEST_PROJECT_DETAILS__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE : Test(3)
     my $self = shift;
 
     $self->{'override'}->replace(
-        'WWW::PivotalTracker::_post_request' => sub($$) {
-            return <<"            HERE";
-<?xml version="1.0" encoding="UTF-8"?>
-<response success="false">
-  <errors>
-    <error>No API access allowed</error>
-  </errors>
-</response>
-            HERE
-        }
+        'WWW::PivotalTracker::_post_request' => sub($$) { die }
     );
 
     use_ok('WWW::PivotalTracker', qw/ project_details /);
@@ -316,12 +297,7 @@ sub TEST_PROJECT_DETAILS__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE : Test(3)
 
     eq_or_diff(
         $response,
-        {
-            success => 'false',
-            errors  => [
-                'No API access allowed',
-            ],
-        },
+        { success => 'false' },
         "project_details response ok"
     );
 }
@@ -334,31 +310,27 @@ sub TEST_SHOW_STORY__BASE_CASE : Test(3)
         'WWW::PivotalTracker::_post_request' => sub($$) {
             return <<"            HERE";
 <?xml version="1.0" encoding="UTF-8"?>
-<response success="true">
-  <story>
-    <id type="integer">320532</id>
-    <story_type>release</story_type>
-    <url>https://www.pivotaltracker.com/story/show/320532</url>
-    <estimate type="integer">-1</estimate>
-    <current_state>unscheduled</current_state>
-    <description></description>
-    <name>Release 1</name>
-    <requested_by>Jacob Helwig</requested_by>
-    <created_at>Dec 20, 2008</created_at>
-    <deadline>Dec 31, 2008</deadline>
-    <notes type="array">
-      <note>
-        <id type="integer">209033</id>
-        <text>Comment!</text>
-        <author>Jacob Helwig</author>
-        <date>Dec 20, 2008</date>
-      </note>
-    </notes>
-    <labels type="array">
-      <label>needs feedback</label>
-    </labels>
-  </story>
-</response>
+<story>
+  <id type="integer">320532</id>
+  <story_type>release</story_type>
+  <url>https://www.pivotaltracker.com/story/show/320532</url>
+  <estimate type="integer">-1</estimate>
+  <current_state>unscheduled</current_state>
+  <description></description>
+  <name>Release 1</name>
+  <requested_by>Jacob Helwig</requested_by>
+  <created_at type="datetime">Dec 20, 2008</created_at>
+  <deadline type="datetime">Dec 31, 2008</deadline>
+  <notes type="array">
+    <note>
+      <id type="integer">209033</id>
+      <text>Comment!</text>
+      <author>Jacob Helwig</author>
+      <noted_at type="datetime">Dec 20, 2008</noted_at>
+    </note>
+  </notes>
+  <labels>needs feedback</labels>
+</story>
             HERE
         }
     );
@@ -372,6 +344,7 @@ sub TEST_SHOW_STORY__BASE_CASE : Test(3)
         $response,
         {
             success       => 'true',
+            accepted_at   => undef,
             created_at    => 'Dec 20, 2008',
             current_state => 'unscheduled',
             deadline      => 'Dec 31, 2008',
@@ -400,16 +373,7 @@ sub TEST_SHOW_STORY__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE : Test(3)
     my $self = shift;
 
     $self->{'override'}->replace(
-        'WWW::PivotalTracker::_post_request' => sub($$) {
-            return <<"            HERE";
-<?xml version="1.0" encoding="UTF-8"?>
-<response success="false">
-  <errors>
-    <error>No API access allowed</error>
-  </errors>
-</response>
-            HERE
-        }
+        'WWW::PivotalTracker::_post_request' => sub($$) { die }
     );
 
     use_ok('WWW::PivotalTracker', qw/ show_story /);
@@ -419,10 +383,7 @@ sub TEST_SHOW_STORY__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE : Test(3)
 
     eq_or_diff(
         $response,
-        {
-            success => 'false',
-            errors  => [ 'No API access allowed', ],
-        },
+        { success => 'false' },
         'show_story ok',
     );
 }
@@ -435,51 +396,46 @@ sub TEST_ALL_STORIES__BASE_CASE : Test(3)
         'WWW::PivotalTracker::_post_request' => sub($$) {
             return <<"            HERE";
 <?xml version="1.0" encoding="UTF-8"?>
-<response success="true">
-  <message>2 stories found</message>
-  <stories count="2">
-    <story>
-      <id type="integer">320532</id>
-      <story_type>release</story_type>
-      <url>https://www.pivotaltracker.com/story/show/320532</url>
-      <estimate type="integer">-1</estimate>
-      <current_state>unscheduled</current_state>
-      <description></description>
-      <name>Release 1</name>
-      <requested_by>Jacob Helwig</requested_by>
-      <created_at>Dec 20, 2008</created_at>
-      <deadline>Dec 31, 2008</deadline>
-      <notes type="array">
-        <note>
-          <id type="integer">209033</id>
-          <text>Comment!</text>
-          <author>Jacob Helwig</author>
-          <date>Dec 20, 2008</date>
-        </note>
-        <note>
-          <id type="integer">209034</id>
-          <text>Another comment!</text>
-          <author>Jacob Helwig</author>
-          <date>Dec 20, 2008</date>
-        </note>
-      </notes>
-    </story>
-    <story>
-      <id type="integer">320008</id>
-      <story_type>feature</story_type>
-      <url>https://www.pivotaltracker.com/story/show/320008</url>
-      <estimate type="integer">-1</estimate>
-      <current_state>unscheduled</current_state>
-      <description></description>
-      <name>Story!</name>
-      <requested_by>Jacob Helwig</requested_by>
-      <created_at>Dec 20, 2008</created_at>
-      <labels type="array">
-        <label>needs feedback</label>
-      </labels>
-    </story>
-  </stories>
-</response>
+<stories type="array" count="2" total="2">
+  <story>
+    <id type="integer">320532</id>
+    <story_type>release</story_type>
+    <url>https://www.pivotaltracker.com/story/show/320532</url>
+    <estimate type="integer">-1</estimate>
+    <current_state>unscheduled</current_state>
+    <description></description>
+    <name>Release 1</name>
+    <requested_by>Jacob Helwig</requested_by>
+    <created_at type="datetime">Dec 20, 2008</created_at>
+    <deadline type="datetime">Dec 31, 2008</deadline>
+    <notes type="array">
+      <note>
+        <id type="integer">209033</id>
+        <text>Comment!</text>
+        <author>Jacob Helwig</author>
+        <noted_at type="datetime">Dec 20, 2008</noted_at>
+      </note>
+      <note>
+        <id type="integer">209034</id>
+        <text>Another comment!</text>
+        <author>Jacob Helwig</author>
+        <noted_at type="datetime">Dec 20, 2008</noted_at>
+      </note>
+    </notes>
+  </story>
+  <story>
+    <id type="integer">320008</id>
+    <story_type>feature</story_type>
+    <url>https://www.pivotaltracker.com/story/show/320008</url>
+    <estimate type="integer">-1</estimate>
+    <current_state>unscheduled</current_state>
+    <description></description>
+    <name>Story!</name>
+    <requested_by>Jacob Helwig</requested_by>
+    <created_at type="datetime">Dec 20, 2008</created_at>
+    <labels>needs feedback</labels>
+  </story>
+</stories>
             HERE
         }
     );
@@ -495,49 +451,51 @@ sub TEST_ALL_STORIES__BASE_CASE : Test(3)
             success => 'true',
             stories => [
                 {
-                  created_at    => 'Dec 20, 2008',
-                  current_state => 'unscheduled',
-                  deadline      => 'Dec 31, 2008',
-                  description   => undef,
-                  estimate      => '-1',
-                  id            => '320532',
-                  labels        => undef,
-                  name          => 'Release 1',
-                  requested_by  => 'Jacob Helwig',
-                  owned_by      => undef,
-                  story_type    => 'release',
-                  url           => 'https://www.pivotaltracker.com/story/show/320532',
-                  notes => [
+                    accepted_at   => undef,
+                    created_at    => 'Dec 20, 2008',
+                    current_state => 'unscheduled',
+                    deadline      => 'Dec 31, 2008',
+                    description   => undef,
+                    estimate      => '-1',
+                    id            => '320532',
+                    labels        => undef,
+                    name          => 'Release 1',
+                    requested_by  => 'Jacob Helwig',
+                    owned_by      => undef,
+                    story_type    => 'release',
+                    url           => 'https://www.pivotaltracker.com/story/show/320532',
+                    notes => [
                     {
-                      author => 'Jacob Helwig',
-                      date   => 'Dec 20, 2008',
-                      id     => '209033',
-                      text   => 'Comment!'
+                        author => 'Jacob Helwig',
+                        date   => 'Dec 20, 2008',
+                        id     => '209033',
+                        text   => 'Comment!'
                     },
                     {
-                      author => 'Jacob Helwig',
-                      date   => 'Dec 20, 2008',
-                      id     => '209034',
-                      text   => 'Another comment!'
+                        author => 'Jacob Helwig',
+                        date   => 'Dec 20, 2008',
+                        id     => '209034',
+                        text   => 'Another comment!'
                     }
-                  ],
+                    ],
                 },
                 {
-                  created_at    => 'Dec 20, 2008',
-                  current_state => 'unscheduled',
-                  deadline      => undef,
-                  description   => undef,
-                  estimate      => '-1',
-                  id            => '320008',
-                  name          => 'Story!',
-                  notes         => undef,
-                  requested_by  => 'Jacob Helwig',
-                  owned_by      => undef,
-                  story_type    => 'feature',
-                  url           => 'https://www.pivotaltracker.com/story/show/320008',
-                  labels => [
+                    accepted_at   => undef,
+                    created_at    => 'Dec 20, 2008',
+                    current_state => 'unscheduled',
+                    deadline      => undef,
+                    description   => undef,
+                    estimate      => '-1',
+                    id            => '320008',
+                    name          => 'Story!',
+                    notes         => undef,
+                    requested_by  => 'Jacob Helwig',
+                    owned_by      => undef,
+                    story_type    => 'feature',
+                    url           => 'https://www.pivotaltracker.com/story/show/320008',
+                    labels => [
                     'needs feedback'
-                  ],
+                    ],
                 }
             ],
         },
@@ -550,16 +508,7 @@ sub TEST_ALL_STORIES__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE : Test(3)
     my $self = shift;
 
     $self->{'override'}->replace(
-        'WWW::PivotalTracker::_post_request' => sub($$) {
-            return <<"            HERE";
-<?xml version="1.0" encoding="UTF-8"?>
-<response success="false">
-  <errors>
-    <error>No API access allowed</error>
-  </errors>
-</response>
-            HERE
-        }
+        'WWW::PivotalTracker::_post_request' => sub($$) { die }
     );
 
     use_ok('WWW::PivotalTracker', qw/ all_stories /);
@@ -569,10 +518,7 @@ sub TEST_ALL_STORIES__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE : Test(3)
 
     eq_or_diff(
         $response,
-        {
-            success => 'false',
-            errors  => [ 'No API access allowed', ],
-        },
+        { success => 'false' },
         'show_story ok',
     );
 }
@@ -609,51 +555,46 @@ sub TEST_STORIES_FOR_FILTER__SANITIZES_STORY_XML : Test(3)
         'WWW::PivotalTracker::_post_request' => sub($$) {
             return <<"            HERE";
 <?xml version="1.0" encoding="UTF-8"?>
-<response success="true">
-  <message>2 stories found for filter 'requested_by:"Jacob Helwig"'</message>
-  <stories count="2">
-    <story>
-      <id type="integer">320532</id>
-      <story_type>release</story_type>
-      <url>https://www.pivotaltracker.com/story/show/320532</url>
-      <estimate type="integer">-1</estimate>
-      <current_state>unscheduled</current_state>
-      <description></description>
-      <name>Release 1</name>
-      <requested_by>Jacob Helwig</requested_by>
-      <created_at>Dec 20, 2008</created_at>
-      <deadline>Dec 31, 2008</deadline>
-      <notes type="array">
-        <note>
-          <id type="integer">209033</id>
-          <text>Comment!</text>
-          <author>Jacob Helwig</author>
-          <date>Dec 20, 2008</date>
-        </note>
-        <note>
-          <id type="integer">209034</id>
-          <text>Another comment!</text>
-          <author>Jacob Helwig</author>
-          <date>Dec 20, 2008</date>
-        </note>
-      </notes>
-    </story>
-    <story>
-      <id type="integer">320008</id>
-      <story_type>feature</story_type>
-      <url>https://www.pivotaltracker.com/story/show/320008</url>
-      <estimate type="integer">-1</estimate>
-      <current_state>unscheduled</current_state>
-      <description></description>
-      <name>Story!</name>
-      <requested_by>Jacob Helwig</requested_by>
-      <created_at>Dec 20, 2008</created_at>
-      <labels type="array">
-        <label>needs feedback</label>
-      </labels>
-    </story>
-  </stories>
-</response>
+<stories type="array" count="2" total="2" filter="requested_by:'Jacob Helwig'">
+<story>
+  <id type="integer">320532</id>
+  <story_type>release</story_type>
+  <url>https://www.pivotaltracker.com/story/show/320532</url>
+  <estimate type="integer">-1</estimate>
+  <current_state>unscheduled</current_state>
+  <description></description>
+  <name>Release 1</name>
+  <requested_by>Jacob Helwig</requested_by>
+  <created_at type="datetime">Dec 20, 2008</created_at>
+  <deadline type="datetime">Dec 31, 2008</deadline>
+  <notes type="array">
+    <note>
+      <id type="integer">209033</id>
+      <text>Comment!</text>
+      <author>Jacob Helwig</author>
+      <noted_at type="datetime">Dec 20, 2008</noted_at>
+    </note>
+    <note>
+      <id type="integer">209034</id>
+      <text>Another comment!</text>
+      <author>Jacob Helwig</author>
+      <noted_at type="datetime">Dec 20, 2008</noted_at>
+    </note>
+  </notes>
+</story>
+<story>
+  <id type="integer">320008</id>
+  <story_type>feature</story_type>
+  <url>https://www.pivotaltracker.com/story/show/320008</url>
+  <estimate type="integer">-1</estimate>
+  <current_state>unscheduled</current_state>
+  <description></description>
+  <name>Story!</name>
+  <requested_by>Jacob Helwig</requested_by>
+  <created_at type="datetime">Dec 20, 2008</created_at>
+  <labels>needs feedback</labels>
+</story>
+</stories>
             HERE
         }
     );
@@ -666,53 +607,55 @@ sub TEST_STORIES_FOR_FILTER__SANITIZES_STORY_XML : Test(3)
     eq_or_diff(
         $response,
         {
-            message => q{2 stories found for filter 'requested_by:"Jacob Helwig"'},
+            filter => q{requested_by:'Jacob Helwig'},
             success => 'true',
             stories => [
                 {
-                  created_at    => 'Dec 20, 2008',
-                  current_state => 'unscheduled',
-                  deadline      => 'Dec 31, 2008',
-                  description   => undef,
-                  estimate      => '-1',
-                  id            => '320532',
-                  labels        => undef,
-                  name          => 'Release 1',
-                  requested_by  => 'Jacob Helwig',
-                  owned_by      => undef,
-                  story_type    => 'release',
-                  url           => 'https://www.pivotaltracker.com/story/show/320532',
-                  notes => [
+                    accepted_at   => undef,
+                    created_at    => 'Dec 20, 2008',
+                    current_state => 'unscheduled',
+                    deadline      => 'Dec 31, 2008',
+                    description   => undef,
+                    estimate      => '-1',
+                    id            => '320532',
+                    labels        => undef,
+                    name          => 'Release 1',
+                    requested_by  => 'Jacob Helwig',
+                    owned_by      => undef,
+                    story_type    => 'release',
+                    url           => 'https://www.pivotaltracker.com/story/show/320532',
+                    notes => [
                     {
-                      author => 'Jacob Helwig',
-                      date   => 'Dec 20, 2008',
-                      id     => '209033',
-                      text   => 'Comment!'
+                        author => 'Jacob Helwig',
+                        date   => 'Dec 20, 2008',
+                        id     => '209033',
+                        text   => 'Comment!'
                     },
                     {
-                      author => 'Jacob Helwig',
-                      date   => 'Dec 20, 2008',
-                      id     => '209034',
-                      text   => 'Another comment!'
+                        author => 'Jacob Helwig',
+                        date   => 'Dec 20, 2008',
+                        id     => '209034',
+                        text   => 'Another comment!'
                     }
-                  ],
+                    ],
                 },
                 {
-                  created_at    => 'Dec 20, 2008',
-                  current_state => 'unscheduled',
-                  deadline      => undef,
-                  description   => undef,
-                  estimate      => '-1',
-                  id            => '320008',
-                  name          => 'Story!',
-                  notes         => undef,
-                  requested_by  => 'Jacob Helwig',
-                  owned_by      => undef,
-                  story_type    => 'feature',
-                  url           => 'https://www.pivotaltracker.com/story/show/320008',
-                  labels => [
+                    accepted_at   => undef,
+                    created_at    => 'Dec 20, 2008',
+                    current_state => 'unscheduled',
+                    deadline      => undef,
+                    description   => undef,
+                    estimate      => '-1',
+                    id            => '320008',
+                    name          => 'Story!',
+                    notes         => undef,
+                    requested_by  => 'Jacob Helwig',
+                    owned_by      => undef,
+                    story_type    => 'feature',
+                    url           => 'https://www.pivotaltracker.com/story/show/320008',
+                    labels => [
                     'needs feedback'
-                  ],
+                    ],
                 }
             ],
         },
@@ -730,31 +673,27 @@ sub TEST_UPDATE_STORY__BASE_CASE : Test(3)
         'WWW::PivotalTracker::_post_request' => sub($$) {
             return <<"            HERE";
 <?xml version="1.0" encoding="UTF-8"?>
-<response success="true">
-  <story>
-    <id type="integer">320532</id>
-    <story_type>release</story_type>
-    <url>https://www.pivotaltracker.com/story/show/320532</url>
-    <estimate type="integer">-1</estimate>
-    <current_state>unscheduled</current_state>
-    <description></description>
-    <name>Release 1</name>
-    <requested_by>Jacob Helwig</requested_by>
-    <created_at>Dec 20, 2008</created_at>
-    <deadline>Dec 31, 2008</deadline>
-    <notes type="array">
-      <note>
-        <id type="integer">209033</id>
-        <text>Comment!</text>
-        <author>Jacob Helwig</author>
-        <date>Dec 20, 2008</date>
-      </note>
-    </notes>
-    <labels type="array">
-      <label>needs feedback</label>
-    </labels>
-  </story>
-</response>
+<story>
+  <id type="integer">320532</id>
+  <story_type>release</story_type>
+  <url>https://www.pivotaltracker.com/story/show/320532</url>
+  <estimate type="integer">-1</estimate>
+  <current_state>unscheduled</current_state>
+  <description></description>
+  <name>Release 1</name>
+  <requested_by>Jacob Helwig</requested_by>
+  <created_at type="datetime">Dec 20, 2008</created_at>
+  <deadline type="datetime">Dec 31, 2008</deadline>
+  <notes type="array">
+    <note>
+      <id type="integer">209033</id>
+      <text>Comment!</text>
+      <author>Jacob Helwig</author>
+      <noted_at type="datetime">Dec 20, 2008</noted_at>
+    </note>
+  </notes>
+  <labels>needs feedback</labels>
+</story>
             HERE
         }
     );
@@ -768,6 +707,7 @@ sub TEST_UPDATE_STORY__BASE_CASE : Test(3)
         $response,
         {
             success       => 'true',
+            accepted_at   => undef,
             created_at    => 'Dec 20, 2008',
             current_state => 'unscheduled',
             deadline      => 'Dec 31, 2008',
@@ -796,16 +736,7 @@ sub TEST_UPDATE_STORY__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE : Test(3)
     my $self = shift;
 
     $self->{'override'}->replace(
-        'WWW::PivotalTracker::_post_request' => sub($$) {
-            return <<"            HERE";
-<?xml version="1.0" encoding="UTF-8"?>
-<response success="false">
-  <errors>
-    <error>No API access allowed</error>
-  </errors>
-</response>
-            HERE
-        }
+        'WWW::PivotalTracker::_post_request' => sub($$) { die; }
     );
 
     use_ok('WWW::PivotalTracker', qw/ update_story /);
@@ -815,10 +746,7 @@ sub TEST_UPDATE_STORY__HANDLES_WHEN_SUCCESS_IS_NOT_TRUE : Test(3)
 
     eq_or_diff(
         $response,
-        {
-            success => 'false',
-            errors  => [ 'No API access allowed', ],
-        },
+        { success => 'false' },
         'update_story ok',
     );
 }

@@ -321,7 +321,7 @@ sub _display_story_long($;$)
     my $story_text =
           sprintf("Story %s (%s) < %s >:\n", $story->{'id'}, $story->{'story_type'}, $story->{'url'})
         . sprintf("           Name: %s\n", $story->{'name'})
-        . sprintf("       Estimate: %s\n", $story->{'estimate'})
+        . sprintf("       Estimate: %s\n", (defined $story->{'estimate'} ? $story->{'estimate'} : ''))
         . sprintf("          State: %s\n", $story->{'current_state'});
 
     if (defined $story->{'description'}) {

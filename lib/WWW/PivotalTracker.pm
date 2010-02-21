@@ -97,19 +97,14 @@ sub project_details($token, $project_id)
 
     my $response = __PACKAGE__->_do_request($token, "projects/$project_id", "GET");
 
-    if (!defined $response || lc $response->{'success'} ne 'true') {
-        return {
-            success => 'false',
-            errors  => (defined $response && exists $response->{'errors'} ? $response->{'errors'} : 'Epic fail!'),
-        };
-    }
+    return { success => 'false' } if (!defined $response);
 
     return {
         success         => 'true',
-        iteration_weeks => $response->{'project'}->{'iteration_length'}->{'content'},
-        name            => $response->{'project'}->{'name'},
-        point_scale     => $response->{'project'}->{'point_scale'},
-        start_day       => $response->{'project'}->{'week_start_day'},
+        iteration_weeks => $response->{'iteration_length'}->{'content'},
+        name            => $response->{'name'},
+        point_scale     => $response->{'point_scale'},
+        start_day       => $response->{'week_start_day'},
     };
 }
 
@@ -147,14 +142,9 @@ sub show_story($token, $project_id, $story_id)
 
     my $response = __PACKAGE__->_do_request($token, "projects/$project_id/stories/$story_id", "GET");
 
-    if (!defined $response || lc $response->{'success'} ne 'true') {
-        return {
-            success => 'false',
-            errors  => (defined $response && exists $response->{'errors'} ? $response->{'errors'} : 'Epic fail!'),
-        };
-    }
+    return { success => 'false' } if (!defined $response);
 
-    my $story = __PACKAGE__->_sanitize_story_xml($response->{'story'}->[0]);
+    my $story = __PACKAGE__->_sanitize_story_xml($response);
 
     return {
         success => 'true',
@@ -174,14 +164,9 @@ sub all_stories($token, $project_id)
 
     my $response = __PACKAGE__->_do_request($token, "projects/$project_id/stories", "GET");
 
-    if (!defined $response || lc $response->{'success'} ne 'true') {
-        return {
-            success => 'false',
-            errors  => (defined $response && exists $response->{'errors'} ? $response->{'errors'} : 'Epic fail!'),
-        };
-    }
+    return { success => 'false' } if (!defined $response);
 
-    my @stories = map { __PACKAGE__->_sanitize_story_xml($_) } @{$response->{'stories'}->{'story'}};
+    my @stories = map { __PACKAGE__->_sanitize_story_xml($_) } @{$response->{'story'}};
 
     return {
         success => 'true',
@@ -254,14 +239,9 @@ sub add_story($token, $project_id, $story_details)
 
     my $response = __PACKAGE__->_do_request($token, "projects/$project_id/stories", "POST", $content);
 
-    if (!defined $response || $response->{'success'} ne 'true') {
-        return {
-            success => 'false',
-            errors  => $response->{'errors'},
-        };
-    }
+    return { success => 'false' } if (!defined $response);
 
-    my $story = __PACKAGE__->_sanitize_story_xml($response->{'story'}->[0]);
+    my $story = __PACKAGE__->_sanitize_story_xml($response);
 
     return {
         success       => 'true',
@@ -276,7 +256,7 @@ Delete an existing story.
     my $result = delete_story($token, $project_id, $story_id);
 
     print $result->{'success'};
-    print $result->{'message'};
+    print $result->{'name'};
 
 =cut
 
@@ -287,17 +267,11 @@ sub delete_story($token, $project_id, $story_id)
 
     my $response = __PACKAGE__->_do_request($token, "projects/$project_id/stories/$story_id", "DELETE");
 
-    if (!defined $response || $response->{'success'} ne 'true') {
-        return {
-            success => 'false',
-            errors  => $response->{'errors'},
-        };
-    }
+    return { success => 'false' } if (!defined $response);
 
-    my $message = $response->{'message'};
     return {
         success => 'true',
-        message => $message,
+        name => $response->{'name'},
     };
 }
 
@@ -313,16 +287,13 @@ Find all stories given search parameters.
 
         @stories = @{$result->{'stories'}};
     }
-    else {
-        print $result->{'errors'};
-    }
 
 In the example above C<< @stories >> will be an array of story hashrefs.  See the description of C<show_story> for the details of the hashrefs.
 
 Any multi-word terms in the search filter must be enclosed by double quotes. (See L<http://www.pivotaltracker.com/help>: Search)
 
     Example:
-        requeser:"Jacob Helwig"
+        requester:"Jacob Helwig"
         owner:"Jacob Helwig"
         mywork:"Jacob Helwig"
         state:unstarted
@@ -336,18 +307,13 @@ sub stories_for_filter($token, $project_id, $search_filter)
 
     my $response = __PACKAGE__->_do_request($token, "projects/$project_id/stories?filter=" . uri_escape($search_filter), "GET");
 
-    if (!defined $response || lc $response->{'success'} ne 'true') {
-        return {
-            success => 'false',
-            errors  => (defined $response && exists $response->{'errors'} ? $response->{'errors'} : 'Epic fail!'),
-        };
-    }
+    return { success => 'false' } if (!defined $response);
 
-    my @stories = map { __PACKAGE__->_sanitize_story_xml($_) } @{$response->{'stories'}->{'story'}};
+    my @stories = map { __PACKAGE__->_sanitize_story_xml($_) } @{$response->{'story'}};
 
     return {
         success => 'true',
-        message => $response->{'message'},
+        filter  => $response->{'filter'},
         stories => [ @stories ],
     };
 }
@@ -388,14 +354,9 @@ sub update_story($token, $project_id, $story_id, $story_details)
 
     my $response = __PACKAGE__->_do_request($token, "projects/$project_id/stories/$story_id", "PUT", $content);
 
-    if (!defined $response || $response->{'success'} ne 'true') {
-        return {
-            success => 'false',
-            errors  => $response->{'errors'},
-        };
-    }
+    return { success => 'false' } if (!defined $response);
 
-    my $story = __PACKAGE__->_sanitize_story_xml($response->{'story'}->[0]);
+    my $story = __PACKAGE__->_sanitize_story_xml($response);
 
     return {
         success => 'true',
@@ -425,14 +386,9 @@ sub add_note($token, $project_id, $story_id, $note)
         __PACKAGE__->_make_xml({ note => { text => $note } })
     );
 
-    if (!defined $response || $response->{'success'} ne 'true') {
-        return {
-            success => 'false',
-            errors  => $response->{'errors'},
-        };
-    }
+    return { success => 'false' } if (!defined $response);
 
-    my $new_note = __PACKAGE__->_sanitize_note_xml($response->{'note'}->[0]);
+    my $new_note = __PACKAGE__->_sanitize_note_xml($response);
 
     return {
         success => 'true',
@@ -460,14 +416,10 @@ sub _sanitize_story_xml($class, $story)
     my $labels = undef;
     my $notes = undef;
 
-    $labels = $story->{'labels'}->{'label'} if exists $story->{'labels'};
+    $labels = [ split(',', $story->{'labels'}) ] if exists $story->{'labels'};
     $notes = [
-        map +{
-            id     => $_->{'id'}->{'content'},
-            author => $_->{'author'},
-            date   => $_->{'date'},
-            text   => $_->{'text'},
-        }, @{$story->{'notes'}->{'note'}}
+        map { $class->_sanitize_note_xml($_) }
+            @{$story->{'notes'}->{'note'}}
     ] if exists $story->{'notes'};
 
     return {
@@ -476,8 +428,9 @@ sub _sanitize_story_xml($class, $story)
         description   => $story->{'description'},
         estimate      => $story->{'estimate'}->{'content'},
         current_state => $story->{'current_state'},
-        created_at    => $story->{'created_at'},
-        deadline      => $story->{'deadline'},
+        created_at    => $story->{'created_at'}->{'content'},
+        accepted_at   => $story->{'accepted_at'}->{'content'},
+        deadline      => $story->{'deadline'}->{'content'},
         story_type    => $story->{'story_type'},
         requested_by  => $story->{'requested_by'},
         owned_by      => $story->{'owned_by'},
@@ -492,7 +445,7 @@ sub _sanitize_note_xml($class, $note)
     return {
         id     => $note->{'id'}->{'content'},
         author => $note->{'author'},
-        date   => $note->{'date'},
+        date   => $note->{'noted_at'}->{'content'},
         text   => $note->{'text'},
     };
     return $note;
@@ -500,7 +453,7 @@ sub _sanitize_note_xml($class, $note)
 
 sub _do_request($class, $token, $request_url, $request_method; $content)
 {
-    my $base_url = "https://www.pivotaltracker.com/services/v1/";
+    my $base_url = "https://www.pivotaltracker.com/services/v3/";
 
     my $request = _Request->new(
         $request_method,
@@ -512,7 +465,8 @@ sub _do_request($class, $token, $request_url, $request_method; $content)
         $content
     );
 
-    my $response = $class->_post_request($request);
+    my $response = eval { $class->_post_request($request) };
+    return if $@;
 
     return XMLin(
         $response,
@@ -523,10 +477,6 @@ sub _do_request($class, $token, $request_url, $request_method; $content)
             note
             story
         /],
-        GroupTags => {
-            errors => 'error',
-            labels => 'label',
-        },
         KeyAttr => [],
         SuppressEmpty => undef,
     );
