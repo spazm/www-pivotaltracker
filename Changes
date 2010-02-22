@@ -4,6 +4,13 @@ global:
 releases:
   - author: 'Jacob Helwig <jhelwig@cpan.org>'
     changes:
+      - Drop Perl6::Parameters from the CLI script.
+      - Update the existing interface to the PT v3 API.
+    date: 2010-02-21T23:02:14Z
+    tags: []
+    version: 0.16_01
+  - author: 'Jacob Helwig <jhelwig@cpan.org>'
+    changes:
       - Add ability to show stories one per line
     date: 2009-01-28T08:27:46Z
     tags: []

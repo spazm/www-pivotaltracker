@@ -5,7 +5,6 @@ blib
 ^Makefile$
 ^Makefile\.old$
 ^MANIFEST\.bak$
-^MANIFEST\.SKIP$
 \.orig$
 pm_to_lib
 .*\.swp$

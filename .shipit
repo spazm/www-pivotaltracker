@@ -1,7 +1,10 @@
-# auto-generated shipit config file.
-steps = FindVersion, ChangeVersion, CheckChangeLog, DistTest, Commit, Tag, MakeDist
+steps = FindVersion, ChangeAllVersions, CheckChangeLog, CheckVersionsMatch, DistTest, Commit, Tag, MakeDist, UploadCPAN, DistClean, Twitter
 
 git.tagpattern = v%v
-git.push_to = perlninja
+git.sign_tag = 1
+
+twitter.config = ~/.twitterrc
+twitter.distname = WWW-PivotalTracker
+twitter.message = Just shipped %d %v - soon at %u
 
 CheckChangeLog.files = ChangeLog

@@ -3,8 +3,11 @@ use inc::Module::Install;
 name     'WWW-PivotalTracker';
 all_from 'lib/WWW/PivotalTracker.pm';
 
-author   'Jacob Helwig <jhelwig@cpan.org>';
-license  'perl';
+author     'Jacob Helwig <jhelwig@cpan.org>';
+license    'perl';
+repository 'git://github.com/jhelwig/www-pivotaltracker.git';
+bugtracker 'http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-PivotalTracker',
+homepage   'http://github.com/jhelwig/www-pivotaltracker',
 
 requires 'aliased';
 requires 'Carp';
