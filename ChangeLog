@@ -1,5 +1,7 @@
 Revision history for Perl extension WWW-PivotalTracker
 
+0.17  Sun, 28 Feb 2010 06:17:03 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+
 0.16_01  Sun, 21 Feb 2010 23:02:14 -0000 (Jacob Helwig <jhelwig@cpan.org>)
      - Drop Perl6::Parameters from the CLI script.
      - Update the existing interface to the PT v3 API.

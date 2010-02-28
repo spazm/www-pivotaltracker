@@ -3,6 +3,11 @@ global:
   name: WWW-PivotalTracker
 releases:
   - author: 'Jacob Helwig <jhelwig@cpan.org>'
+    changes: []
+    date: 2010-02-28T06:17:03Z
+    tags: []
+    version: 0.17
+  - author: 'Jacob Helwig <jhelwig@cpan.org>'
     changes:
       - Drop Perl6::Parameters from the CLI script.
       - Update the existing interface to the PT v3 API.
