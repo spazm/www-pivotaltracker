@@ -1,8 +1,9 @@
 .*.swp
+/blib
+/inc/Module/Install*
 /Makefile
 /Makefile.old
 /MANIFEST.bak
-/WWW-PivotalTracker-*
-/inc/Module/Install*
-/blib
+/META.yml
 /pm_to_blib
+/WWW-PivotalTracker-*
