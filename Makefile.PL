@@ -24,6 +24,7 @@ requires 'URI::Escape';
 requires 'XML::Simple';
 
 test_requires 'Sub::Override';
+test_requires 'Test::CheckChanges' => '0.14';
 test_requires 'Test::Class';
 test_requires 'Test::More';
 test_requires 'Test::Most';
