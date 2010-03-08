@@ -6,8 +6,9 @@ all_from 'lib/WWW/PivotalTracker.pm';
 author     'Jacob Helwig <jhelwig@cpan.org>';
 license    'perl';
 repository 'git://github.com/jhelwig/www-pivotaltracker.git';
-bugtracker 'http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-PivotalTracker',
 homepage   'http://github.com/jhelwig/www-pivotaltracker',
+
+readme_markdown_from 'lib/WWW/PivotalTracker/Command.pm';
 
 requires 'aliased';
 requires 'Carp';
@@ -17,6 +18,7 @@ requires 'Getopt::Long::Descriptive';
 requires 'Hash::Merge';
 requires 'HTTP::Request';
 requires 'LWP::UserAgent';
+requires 'Moose';
 requires 'parent';
 requires 'Perl6::Parameters';
 requires 'Pod::Usage';
@@ -30,5 +32,7 @@ test_requires 'Test::More';
 test_requires 'Test::Most';
 
 install_script 'pivotal_tracker';
+
+auto_provides_class;
 
 WriteAll;
