@@ -1,6 +1,6 @@
 .*.swp
 /blib
-/inc/Module/Install*
+/inc/*
 /Makefile
 /Makefile.old
 /MANIFEST.bak

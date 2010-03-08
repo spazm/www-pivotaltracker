@@ -1,5 +1,12 @@
 Revision history for Perl extension WWW-PivotalTracker
 
+1.00  Mon, 08 Mar 2010 04:49:20 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Re-enable Test::CheckChanges now that it supports developer releases.
+     - Clean up t/00-load.t
+     - Add META.yml to the .gitignore, and sort it.
+     - Move the guts of the pivotal_tracker script into a module.
+     - Update the Makefile.PL
+
 0.17  Sun, 28 Feb 2010 06:17:03 -0000 (Jacob Helwig <jhelwig@cpan.org>)
 
 0.16_01  Sun, 21 Feb 2010 23:02:14 -0000 (Jacob Helwig <jhelwig@cpan.org>)

@@ -27,9 +27,26 @@ use XML::Simple qw/
 
 WWW::PivotalTracker - Functional interface to Pivotal Tracker L<http://www.pivotaltracker.com/>
 
+=begin readme
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+=end readme
+
+=head1 VERSION
+
+1.00
+
 =cut
 
-our $VERSION = "0.17";
+our $VERSION = "1.00";
 
 =head1 SYNOPSIS
 
@@ -522,12 +539,6 @@ You can also look for information at:
 
 =over 4
 
-=item * Mailing list
-
-L<http://lists.technosorcery.net/listinfo.cgi/www-pivotaltracker-technosorcery.net>
-
-C<< <www-pivotaltracker at lists.technosorcery.net> >>
-
 =item * RT: CPAN's request tracker
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-PivotalTracker>
@@ -548,6 +559,10 @@ L<http://search.cpan.org/dist/WWW-PivotalTracker/>
 
 L<git://github.com/jhelwig/www-pivotaltracker.git>
 
+=item * Webpage
+
+L<http://github.com/jhelwig/www-pivotaltracker>
+
 =back
 
 =head1 ACKNOWLEDGEMENTS
@@ -556,7 +571,7 @@ Chris Hellmuth
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008 Jacob Helwig.
+Copyright 2008-2010 Jacob Helwig.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

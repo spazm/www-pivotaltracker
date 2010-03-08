@@ -3,6 +3,16 @@ global:
   name: WWW-PivotalTracker
 releases:
   - author: 'Jacob Helwig <jhelwig@cpan.org>'
+    changes:
+      - Re-enable Test::CheckChanges now that it supports developer releases.
+      - Clean up t/00-load.t
+      - 'Add META.yml to the .gitignore, and sort it.'
+      - Move the guts of the pivotal_tracker script into a module.
+      - Update the Makefile.PL
+    date: 2010-03-08T04:49:20Z
+    tags: []
+    version: 1.00
+  - author: 'Jacob Helwig <jhelwig@cpan.org>'
     changes: []
     date: 2010-02-28T06:17:03Z
     tags: []

@@ -2,7 +2,7 @@ use MooseX::Declare;
 
 class WWW::PivotalTracker::Command
 {
-    our $VERSION = '0.01';
+    our $VERSION = '1.00';
 
     use Getopt::Long::Descriptive qw( :all      );
     use Hash::Merge               qw( merge     );
@@ -500,3 +500,81 @@ class WWW::PivotalTracker::Command
 }
 
 1;
+__END__
+
+=head1 NAME
+
+WWW::PivotalTracker::Command - Command-line interface to Pivotal Tracker L<http://www.pivotaltracker.com/>
+
+=head1 VERSION
+
+1.00
+
+=cut
+
+=head1 SYNOPSIS
+
+This module provides a command-line interface to interact with the Pivotal
+Tracker API.
+
+    #!/usr/bin/perl
+
+    use WWW::PivotalTracker::Command;
+    my $cmd = WWW::PivotalTracker::Command->new();
+    $cmd->run();
+
+=head1 AUTHOR
+
+Jacob Helwig, C<< <jhelwig at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-www-pivotaltracker at rt.cpan.org>,
+or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-PivotalTracker>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+=head1 SUPPORT
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-PivotalTracker>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/WWW-PivotalTracker>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/WWW-PivotalTracker>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/WWW-PivotalTracker/>
+
+=item * Source code
+
+L<git://github.com/jhelwig/www-pivotaltracker.git>
+
+=item * Webpage
+
+L<http://github.com/jhelwig/www-pivotaltracker>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+Chris Hellmuth
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2008-2010 Jacob Helwig.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+
+# vim: set tabstop=4 shiftwidth=4: 
