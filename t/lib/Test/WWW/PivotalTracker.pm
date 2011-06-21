@@ -256,6 +256,30 @@ sub TEST__SANITIZE_STORY_XML : Test(4)
                     text     => 'Comment!',
                 }],
             },
+            tasks         => {
+                type => 'array',
+                task => [{
+                    id          => { type => 'integer',  content => '1386349', },
+                    description => "Create a WiKi page for the appropriate Important errors/warning for which we send notifications.",
+                    position    => { type => 'integer',  content => '1', },
+                    complete    => { type => 'boolean',  content => 'false', },
+                    created_at  => { type => 'datetime', content => '2011/02/21 16:19:03 PST', },
+                },
+                {
+                    id          => { type => 'integer',  content => '1386353', },
+                    description => "Add the correct text and links in story.php (lines  732 - 735) to point to the created pages in the wiki.",
+                    position    => { type => 'integer',  content => '2', },
+                    complete    => { type => 'boolean',  content => 'false', },
+                    created_at  => { type => 'datetime', content => '2011/02/21 16:19:29 PST', },
+                },
+                {
+                    id          => { type => 'integer',  content => '1386355', },
+                    description => "Enable notifications in Tools line 500",
+                    position    => { type => 'integer',  content => '3', },
+                    complete    => { type => 'boolean',  content => 'false', },
+                    created_at  => { type => 'datetime', content => '2011/02/21 16:19:59 PST', },
+                }],
+            },
         },
         '$response ok',
     );
