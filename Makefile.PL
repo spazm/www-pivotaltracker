@@ -33,6 +33,6 @@ test_requires 'Test::Most';
 
 install_script 'pivotal_tracker';
 
-auto_provides_class;
+auto_provides_class(qw/class role package/);
 
 WriteAll;
