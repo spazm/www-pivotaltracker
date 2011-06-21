@@ -8,11 +8,16 @@ use base qw(Test::Class);
 use Sub::Override;
 use Test::Most;
 
-sub make_fixture : Test(setup => 1)
+sub load_module : Test(startup=>1)
 {
     my $self = shift;
 
     use_ok('WWW::PivotalTracker');
+}
+
+sub make_fixture : Test(setup)
+{
+    my $self = shift;
 
     $self->{'override'} = Sub::Override->new(
         'WWW::PivotalTracker::_post_request' => sub($$) {
@@ -126,20 +131,6 @@ sub TEST__DO_REQUEST__ARRAYIFIES_ELEMENTS_THAT_COULD_APPEAR_MORE_THAN_ONCE : Tes
         <complete type="boolean">false</complete>
         <created_at type="datetime">2011/02/21 16:19:03 PST</created_at>
       </task>
-      <task>
-        <id type="integer">1386353</id>
-        <description>Add the correct text and links in story.php (lines  732 - 735) to point to the created pages in the wiki.</description>
-        <position type="integer">2</position>
-        <complete type="boolean">false</complete>
-        <created_at type="datetime">2011/02/21 16:19:29 PST</created_at>
-      </task>
-      <task>
-        <id type="integer">1386355</id>
-        <description>Enable notifications in Tools line 500</description>
-        <position type="integer">3</position>
-        <complete type="boolean">false</complete>
-        <created_at type="datetime">2011/02/21 16:19:59 PST</created_at>
-      </task>
     </tasks>
     <labels>needs feedback</labels>
   </story>
@@ -162,6 +153,12 @@ sub TEST__DO_REQUEST__ARRAYIFIES_ELEMENTS_THAT_COULD_APPEAR_MORE_THAN_ONCE : Tes
         $response->{'story'}->[0]->{'notes'}->{'note'},
         'ARRAY',
         '$response->{story}->[0]->{notes}->{note}',
+    );
+
+    isa_ok(
+        $response->{'story'}->[0]->{'tasks'}->{'task'},
+        'ARRAY',
+        '$response->{story}->[0]->{tasks}->{task}',
     );
 }
 
@@ -309,6 +306,29 @@ sub TEST__SANITIZE_STORY_XML : Test(4)
                 id     => '209033',
                 text   => 'Comment!',
             }],
+            tasks => [
+            {
+                complete    => 'false',
+                date        => '2011/02/21 16:19:03 PST',
+                description => 'Create a WiKi page for the appropriate Important errors/warning for which we send notifications.',
+                id          => '1386349',
+                position    => '1',
+            },
+            {
+                complete    => 'false',
+                date        => '2011/02/21 16:19:29 PST',
+                description => 'Add the correct text and links in story.php (lines  732 - 735) to point to the created pages in the wiki.',
+                id          => '1386353',
+                position    => '2',
+            },
+            {
+                complete    => 'false',
+                date        => '2011/02/21 16:19:59 PST',
+                description => 'Enable notifications in Tools line 500',
+                id          => '1386355',
+                position    => '3',
+            }
+            ],
         },
         '$sanitized_response ok',
     );
@@ -407,20 +427,6 @@ sub TEST_SHOW_STORY__BASE_CASE : Test(3)
       <complete type="boolean">false</complete>
       <created_at type="datetime">2011/02/21 16:19:03 PST</created_at>
     </task>
-    <task>
-      <id type="integer">1386353</id>
-      <description>Add the correct text and links in story.php (lines  732 - 735) to point to the created pages in the wiki.</description>
-      <position type="integer">2</position>
-      <complete type="boolean">false</complete>
-      <created_at type="datetime">2011/02/21 16:19:29 PST</created_at>
-    </task>
-    <task>
-      <id type="integer">1386355</id>
-      <description>Enable notifications in Tools line 500</description>
-      <position type="integer">3</position>
-      <complete type="boolean">false</complete>
-      <created_at type="datetime">2011/02/21 16:19:59 PST</created_at>
-    </task>
   </tasks>
   <labels>needs feedback</labels>
 </story>
@@ -455,6 +461,13 @@ sub TEST_SHOW_STORY__BASE_CASE : Test(3)
                 date   => 'Dec 20, 2008',
                 id     => '209033',
                 text   => 'Comment!',
+            }],
+            tasks => [{
+                complete    => 'false',
+                date        => '2011/02/21 16:19:03 PST',
+                description => 'Create a WiKi page for the appropriate Important errors/warning for which we send notifications.',
+                id          => '1386349',
+                position    => '1',
             }],
         },
         'show_story ok',
@@ -594,6 +607,29 @@ sub TEST_ALL_STORIES__BASE_CASE : Test(3)
                         text   => 'Another comment!'
                     }
                     ],
+                    tasks => [
+                    {
+                        complete    => 'false',
+                        date        => '2011/02/21 16:19:03 PST',
+                        description => 'Create a WiKi page for the appropriate Important errors/warning for which we send notifications.',
+                        id          => '1386349',
+                        position    => '1',
+                    },
+                    {
+                        complete    => 'false',
+                        date        => '2011/02/21 16:19:29 PST',
+                        description => 'Add the correct text and links in story.php (lines  732 - 735) to point to the created pages in the wiki.',
+                        id          => '1386353',
+                        position    => '2',
+                    },
+                    {
+                        complete    => 'false',
+                        date        => '2011/02/21 16:19:59 PST',
+                        description => 'Enable notifications in Tools line 500',
+                        id          => '1386355',
+                        position    => '3',
+                    }
+                    ],
                 },
                 {
                     accepted_at   => undef,
@@ -608,6 +644,7 @@ sub TEST_ALL_STORIES__BASE_CASE : Test(3)
                     requested_by  => 'Jacob Helwig',
                     owned_by      => undef,
                     story_type    => 'feature',
+                    tasks         => undef,
                     url           => 'https://www.pivotaltracker.com/story/show/320008',
                     labels => [
                     'needs feedback'
@@ -777,6 +814,29 @@ sub TEST_STORIES_FOR_FILTER__SANITIZES_STORY_XML : Test(3)
                         text   => 'Another comment!'
                     }
                     ],
+                    tasks => [
+                    {
+                        complete    => 'false',
+                        date        => '2011/02/21 16:19:03 PST',
+                        description => 'Create a WiKi page for the appropriate Important errors/warning for which we send notifications.',
+                        id          => '1386349',
+                        position    => '1',
+                    },
+                    {
+                        complete    => 'false',
+                        date        => '2011/02/21 16:19:29 PST',
+                        description => 'Add the correct text and links in story.php (lines  732 - 735) to point to the created pages in the wiki.',
+                        id          => '1386353',
+                        position    => '2',
+                    },
+                    {
+                        complete    => 'false',
+                        date        => '2011/02/21 16:19:59 PST',
+                        description => 'Enable notifications in Tools line 500',
+                        id          => '1386355',
+                        position    => '3',
+                    }
+                    ],
                 },
                 {
                     accepted_at   => undef,
@@ -791,6 +851,7 @@ sub TEST_STORIES_FOR_FILTER__SANITIZES_STORY_XML : Test(3)
                     requested_by  => 'Jacob Helwig',
                     owned_by      => undef,
                     story_type    => 'feature',
+                    tasks         => undef,
                     url           => 'https://www.pivotaltracker.com/story/show/320008',
                     labels => [
                     'needs feedback'
@@ -888,6 +949,29 @@ sub TEST_UPDATE_STORY__BASE_CASE : Test(3)
                 id     => '209033',
                 text   => 'Comment!',
             }],
+            tasks => [
+            {
+                complete    => 'false',
+                date        => '2011/02/21 16:19:03 PST',
+                description => 'Create a WiKi page for the appropriate Important errors/warning for which we send notifications.',
+                id          => '1386349',
+                position    => '1',
+            },
+            {
+                complete    => 'false',
+                date        => '2011/02/21 16:19:29 PST',
+                description => 'Add the correct text and links in story.php (lines  732 - 735) to point to the created pages in the wiki.',
+                id          => '1386353',
+                position    => '2',
+            },
+            {
+                complete    => 'false',
+                date        => '2011/02/21 16:19:59 PST',
+                description => 'Enable notifications in Tools line 500',
+                id          => '1386355',
+                position    => '3',
+            }
+            ],
         },
         'show_story ok',
     );
