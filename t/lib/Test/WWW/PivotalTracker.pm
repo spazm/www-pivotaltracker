@@ -118,6 +118,29 @@ sub TEST__DO_REQUEST__ARRAYIFIES_ELEMENTS_THAT_COULD_APPEAR_MORE_THAN_ONCE : Tes
         <noted_at type="datetime">Dec 20, 2008</noted_at>
       </note>
     </notes>
+    <tasks type="array">
+      <task>
+        <id type="integer">1386349</id>
+        <description>Create a WiKi page for the appropriate Important errors/warning for which we send notifications.</description>
+        <position type="integer">1</position>
+        <complete type="boolean">false</complete>
+        <created_at type="datetime">2011/02/21 16:19:03 PST</created_at>
+      </task>
+      <task>
+        <id type="integer">1386353</id>
+        <description>Add the correct text and links in story.php (lines  732 - 735) to point to the created pages in the wiki.</description>
+        <position type="integer">2</position>
+        <complete type="boolean">false</complete>
+        <created_at type="datetime">2011/02/21 16:19:29 PST</created_at>
+      </task>
+      <task>
+        <id type="integer">1386355</id>
+        <description>Enable notifications in Tools line 500</description>
+        <position type="integer">3</position>
+        <complete type="boolean">false</complete>
+        <created_at type="datetime">2011/02/21 16:19:59 PST</created_at>
+      </task>
+    </tasks>
     <labels>needs feedback</labels>
   </story>
 </response>
@@ -169,6 +192,29 @@ sub TEST__SANITIZE_STORY_XML : Test(4)
       <noted_at type="datetime">Dec 20, 2008</noted_at>
     </note>
   </notes>
+  <tasks type="array">
+    <task>
+      <id type="integer">1386349</id>
+      <description>Create a WiKi page for the appropriate Important errors/warning for which we send notifications.</description>
+      <position type="integer">1</position>
+      <complete type="boolean">false</complete>
+      <created_at type="datetime">2011/02/21 16:19:03 PST</created_at>
+    </task>
+    <task>
+      <id type="integer">1386353</id>
+      <description>Add the correct text and links in story.php (lines  732 - 735) to point to the created pages in the wiki.</description>
+      <position type="integer">2</position>
+      <complete type="boolean">false</complete>
+      <created_at type="datetime">2011/02/21 16:19:29 PST</created_at>
+    </task>
+    <task>
+      <id type="integer">1386355</id>
+      <description>Enable notifications in Tools line 500</description>
+      <position type="integer">3</position>
+      <complete type="boolean">false</complete>
+      <created_at type="datetime">2011/02/21 16:19:59 PST</created_at>
+    </task>
+  </tasks>
   <labels>needs feedback</labels>
 </story>
             HERE
@@ -329,6 +375,29 @@ sub TEST_SHOW_STORY__BASE_CASE : Test(3)
       <noted_at type="datetime">Dec 20, 2008</noted_at>
     </note>
   </notes>
+  <tasks type="array">
+    <task>
+      <id type="integer">1386349</id>
+      <description>Create a WiKi page for the appropriate Important errors/warning for which we send notifications.</description>
+      <position type="integer">1</position>
+      <complete type="boolean">false</complete>
+      <created_at type="datetime">2011/02/21 16:19:03 PST</created_at>
+    </task>
+    <task>
+      <id type="integer">1386353</id>
+      <description>Add the correct text and links in story.php (lines  732 - 735) to point to the created pages in the wiki.</description>
+      <position type="integer">2</position>
+      <complete type="boolean">false</complete>
+      <created_at type="datetime">2011/02/21 16:19:29 PST</created_at>
+    </task>
+    <task>
+      <id type="integer">1386355</id>
+      <description>Enable notifications in Tools line 500</description>
+      <position type="integer">3</position>
+      <complete type="boolean">false</complete>
+      <created_at type="datetime">2011/02/21 16:19:59 PST</created_at>
+    </task>
+  </tasks>
   <labels>needs feedback</labels>
 </story>
             HERE
@@ -422,6 +491,29 @@ sub TEST_ALL_STORIES__BASE_CASE : Test(3)
         <noted_at type="datetime">Dec 20, 2008</noted_at>
       </note>
     </notes>
+    <tasks type="array">
+      <task>
+        <id type="integer">1386349</id>
+        <description>Create a WiKi page for the appropriate Important errors/warning for which we send notifications.</description>
+        <position type="integer">1</position>
+        <complete type="boolean">false</complete>
+        <created_at type="datetime">2011/02/21 16:19:03 PST</created_at>
+      </task>
+      <task>
+        <id type="integer">1386353</id>
+        <description>Add the correct text and links in story.php (lines  732 - 735) to point to the created pages in the wiki.</description>
+        <position type="integer">2</position>
+        <complete type="boolean">false</complete>
+        <created_at type="datetime">2011/02/21 16:19:29 PST</created_at>
+      </task>
+      <task>
+        <id type="integer">1386355</id>
+        <description>Enable notifications in Tools line 500</description>
+        <position type="integer">3</position>
+        <complete type="boolean">false</complete>
+        <created_at type="datetime">2011/02/21 16:19:59 PST</created_at>
+      </task>
+    </tasks>
   </story>
   <story>
     <id type="integer">320008</id>
@@ -581,6 +673,29 @@ sub TEST_STORIES_FOR_FILTER__SANITIZES_STORY_XML : Test(3)
       <noted_at type="datetime">Dec 20, 2008</noted_at>
     </note>
   </notes>
+  <tasks type="array">
+    <task>
+      <id type="integer">1386349</id>
+      <description>Create a WiKi page for the appropriate Important errors/warning for which we send notifications.</description>
+      <position type="integer">1</position>
+      <complete type="boolean">false</complete>
+      <created_at type="datetime">2011/02/21 16:19:03 PST</created_at>
+    </task>
+    <task>
+      <id type="integer">1386353</id>
+      <description>Add the correct text and links in story.php (lines  732 - 735) to point to the created pages in the wiki.</description>
+      <position type="integer">2</position>
+      <complete type="boolean">false</complete>
+      <created_at type="datetime">2011/02/21 16:19:29 PST</created_at>
+    </task>
+    <task>
+      <id type="integer">1386355</id>
+      <description>Enable notifications in Tools line 500</description>
+      <position type="integer">3</position>
+      <complete type="boolean">false</complete>
+      <created_at type="datetime">2011/02/21 16:19:59 PST</created_at>
+    </task>
+  </tasks>
 </story>
 <story>
   <id type="integer">320008</id>
@@ -692,6 +807,29 @@ sub TEST_UPDATE_STORY__BASE_CASE : Test(3)
       <noted_at type="datetime">Dec 20, 2008</noted_at>
     </note>
   </notes>
+  <tasks type="array">
+    <task>
+      <id type="integer">1386349</id>
+      <description>Create a WiKi page for the appropriate Important errors/warning for which we send notifications.</description>
+      <position type="integer">1</position>
+      <complete type="boolean">false</complete>
+      <created_at type="datetime">2011/02/21 16:19:03 PST</created_at>
+    </task>
+    <task>
+      <id type="integer">1386353</id>
+      <description>Add the correct text and links in story.php (lines  732 - 735) to point to the created pages in the wiki.</description>
+      <position type="integer">2</position>
+      <complete type="boolean">false</complete>
+      <created_at type="datetime">2011/02/21 16:19:29 PST</created_at>
+    </task>
+    <task>
+      <id type="integer">1386355</id>
+      <description>Enable notifications in Tools line 500</description>
+      <position type="integer">3</position>
+      <complete type="boolean">false</complete>
+      <created_at type="datetime">2011/02/21 16:19:59 PST</created_at>
+    </task>
+  </tasks>
   <labels>needs feedback</labels>
 </story>
             HERE
