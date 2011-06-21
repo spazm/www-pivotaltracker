@@ -385,7 +385,7 @@ sub update_story($token, $project_id, $story_id, $story_details)
 
 Add a note to an existing story.
 
-    my $result = add_comment($token, $project_id, $story_id, $note);
+    my $result = add_note($token, $project_id, $story_id, $note);
 
 See the description of C<show_story> for the details of C<$result>.
 
