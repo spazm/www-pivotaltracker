@@ -432,12 +432,18 @@ sub _sanitize_story_xml($class, $story)
 {
     my $labels = undef;
     my $notes = undef;
+    my $tasks = undef;
 
     $labels = [ split(',', $story->{'labels'}) ] if exists $story->{'labels'};
     $notes = [
         map { $class->_sanitize_note_xml($_) }
             @{$story->{'notes'}->{'note'}}
     ] if exists $story->{'notes'};
+
+    $tasks = [
+        map { $class->_sanitize_task_xml($_) }
+            @{$story->{'tasks'}->{'task'}}
+    ] if exists $story->{'tasks'};
 
     return {
         id            => $story->{'id'}->{'content'},
@@ -453,6 +459,7 @@ sub _sanitize_story_xml($class, $story)
         owned_by      => $story->{'owned_by'},
         labels        => $labels,
         notes         => $notes,
+        tasks         => $tasks,
         url           => $story->{'url'},
     };
 }
@@ -466,6 +473,18 @@ sub _sanitize_note_xml($class, $note)
         text   => $note->{'text'},
     };
     return $note;
+}
+
+sub _sanitize_task_xml($class, $task)
+{
+    return {
+        id     => $task->{'id'}->{'content'},
+        position => $task->{'position'}->{'content'},
+        description => $task->{'description'},
+        complete => $task->{complete}->{'content'},
+        date   => $task->{'created_at'}->{'content'},
+    };
+    return $task;
 }
 
 sub _do_request($class, $token, $request_url, $request_method; $content)
@@ -492,6 +511,7 @@ sub _do_request($class, $token, $request_url, $request_method; $content)
             iteration
             label
             note
+            task
             story
         /],
         KeyAttr => [],
