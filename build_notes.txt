@@ -1,0 +1,3 @@
+building prerequisites:
+   Module::Install::ReadmeMarkdownFromPod
+   Module::Install::ProvidesClass
