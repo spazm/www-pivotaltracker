@@ -55,6 +55,7 @@ This module provides simple methods to interact with the Pivotal Tracker API.
     use WWW::PivotalTracker qw/
         add_note
         add_story
+        add_task
         all_stories
         delete_story
         project_details
@@ -76,6 +77,9 @@ Nothing is exported by default.  See B<FUNCTIONS> for the exportable functions.
 our @EXPORT_OK = qw/
     add_note
     add_story
+    add_task
+    all_iterations
+    show_iteration
     all_stories
     delete_story
     project_details
@@ -125,6 +129,51 @@ sub project_details($token, $project_id)
     };
 }
 
+sub show_iteration($token, $project_id, $iteration_id)
+{
+    croak("Malformed Project ID: '$project_id'") unless __PACKAGE__->_check_project_id($project_id);
+    croak("Malformed Iteration ID: '$iteration_id'") unless __PACKAGE__->_check_iteration_id($iteration_id);
+
+    my $response = __PACKAGE__->_do_request($token, "projects/$project_id/iterations/$iteration_id", "GET");
+
+    return { success => 'false' } if (!defined $response);
+
+    my $iteration = __PACKAGE__->_sanitize_iteration_xml($response);
+
+    return {
+        success => 'true',
+        %{$iteration},
+    };
+
+}
+
+#offset and limit are optional
+sub all_iterations($token, $project_id; $offset, $limit)
+{
+    croak("Malformed Project ID: '$project_id'") unless __PACKAGE__->_check_project_id($project_id);
+    $offset = 0 unless __PACKAGE__->_check_iteration_offset($offset);
+    $limit  = 0 unless __PACKAGE__->_check_iteration_offset($limit);
+    my $path = "projects/$project_id/iterations";
+    my @args;
+    push @args, "offset=$offset" if $offset;
+    push @args, "limit=$limit"   if $limit;
+    if (@args) {
+        $path .= '?' . join('&', @args);
+    }
+
+    my $response = __PACKAGE__->_do_request($token, $path, "GET");
+
+    return {success => 'false'} if (!defined $response);
+
+    my @iterations =
+      map {__PACKAGE__->_sanitize_iteration_xml($_)} @{$response->{'iteration'}};
+
+    return {
+        success    => 'true',
+        iterations => [@iterations],
+    };
+}
+
 =head2 show_story
 
 Return a hashref with the details of a specific story.
@@ -151,6 +200,7 @@ Return a hashref with the details of a specific story.
     $story->{'url'}
 
 =cut
+
 
 sub show_story($token, $project_id, $story_id)
 {
@@ -413,9 +463,46 @@ sub add_note($token, $project_id, $story_id, $note)
     };
 }
 
+=head2 add_task
+
+Add a task to an existing story.
+
+    my $result = add_task($token, $project_id, $story_id, $task_description);
+
+See the description of C<show_story> for the details of C<$result>.
+
+=cut
+
+sub add_task($token, $project_id, $story_id, $task)
+{
+    croak("Malformed Project ID: '$project_id'") unless __PACKAGE__->_check_project_id($project_id);
+    croak("Malformed Story ID: '$story_id'") unless __PACKAGE__->_check_story_id($story_id);
+
+    my $response = __PACKAGE__->_do_request(
+        $token,
+        "projects/$project_id/stories/$story_id/tasks",
+        "POST",
+        __PACKAGE__->_make_xml({ task => { description => $task } })
+    );
+
+    return { success => 'false' } if (!defined $response);
+
+    my $new_task = __PACKAGE__->_sanitize_task_xml($response);
+
+    return {
+        success => 'true',
+        %{$new_task},
+    };
+}
+
 sub _check_story_id($class, $story_id)
 {
     return $story_id =~ m/^\d+$/ ? 1 : 0;
+}
+
+sub _check_task_id($class, $task_id)
+{
+    return $task_id =~ m/^\d+$/ ? 1 : 0;
 }
 
 sub _check_project_id($class, $project_id)
@@ -423,9 +510,39 @@ sub _check_project_id($class, $project_id)
     return $project_id =~ m/^\d+$/ ? 1 : 0;
 }
 
+sub _check_iteration_offset($class, $offset)
+{
+    return 0 unless defined $offset;
+    return $offset =~ m/^-? \d+ $/x ? 1 : 0;
+}
+
+sub _check_iteration_id($class, $iteration_id)
+{
+    my %valid_iteration_id = map { $_ => 1 } qw( done current backlog current_backlog );
+    return $valid_iteration_id{ $iteration_id } ? 1 : 0;
+}
+
 sub _is_one_of($class, $element, $set)
 {
     return((scalar grep { $_ eq $element } @$set) ? 1 : 0);
+}
+
+sub _sanitize_iteration_xml($class, $iteration)
+{
+    my $stories = undef;
+    $stories = [
+        map { $class->_sanitize_story_xml($_) }
+            @{$iteration->{'stories'}->{'story'}}
+    ] if exists $iteration->{'stories'};
+    
+    return {
+        id            => $iteration->{id}{content},
+        number        => $iteration->{number}{content},
+        start         => $iteration->{start}{content},
+        finish        => $iteration->{start}{content},
+        team_strength => $iteration->{team_strength}{content},
+        stories       => $stories,
+    }
 }
 
 sub _sanitize_story_xml($class, $story)
@@ -478,11 +595,11 @@ sub _sanitize_note_xml($class, $note)
 sub _sanitize_task_xml($class, $task)
 {
     return {
-        id     => $task->{'id'}->{'content'},
-        position => $task->{'position'}->{'content'},
+        id          => $task->{'id'}->{'content'},
+        position    => $task->{'position'}->{'content'},
         description => $task->{'description'},
-        complete => $task->{complete}->{'content'},
-        date   => $task->{'created_at'}->{'content'},
+        complete    => $task->{complete}->{'content'},
+        date        => $task->{'created_at'}->{'content'},
     };
     return $task;
 }
