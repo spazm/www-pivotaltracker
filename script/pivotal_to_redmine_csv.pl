@@ -46,7 +46,7 @@ my %field_name = (
     current_state => 'status',
     deadline      => 'deadline',
     description   => 'description',
-    estimate      => 'estimate',
+    estimate      => 'story points',
     id            => 'pivotal_id',
     labels        => 'category',
     name          => 'subject',
@@ -68,6 +68,7 @@ my @fields = qw(
   current_state
   deadline
   labels
+  note
 );
 
 my %story_map = (
@@ -120,8 +121,20 @@ print _to_csv( @csv_fields ) , "\n";
             $story->{story_type}    = $story_map{$story->{story_type}            || ''};
             $story->{requested_by}  = $user_map{$story->{requested_by}           || ''};
             $story->{owned_by}      = $user_map{$story->{owned_by}               || ''};
+            $story->{note}='';
             my @data = @$story{@fields};
             print _to_csv(@data), "\n";
+
+            foreach my $note (@{ $story->{notes}})
+            {
+                print STDERR Dumper $note;
+                my $s;
+                $s->{id}     = $story->{id};
+                $s->{note}   = join("\n",$note->{date}, $note->{author},'',$note->{text});
+                $s->{requested_by} = $user_map{$note->{author}};
+                my @data = map {defined $_ ? $_ : ''} @$s{@fields};
+                print _to_csv(@data), "\n";
+            }
         }
     }
 }
