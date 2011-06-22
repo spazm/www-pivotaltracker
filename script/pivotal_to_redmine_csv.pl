@@ -11,6 +11,7 @@ use WWW::PivotalTracker qw(
   all_stories
   show_story
   project_details
+  all_iterations
 );
 
 my $API     = '9c1d6080bcbf14534e0e0756547373b0';
@@ -56,6 +57,7 @@ my %field_name = (
 my @fields = qw(
   id
   story_type
+  target_version
   name
   description
   requested_by
@@ -96,21 +98,30 @@ my %current_state_map = (
 );
 
 my @csv_fields = map { $field_name{ $_ } || $_ } @fields;
+print _to_csv( @csv_fields ) , "\n";
 {
-    my $stories = all_stories($API, $PROJECT)->{stories};
-#    my $story   = show_story( $API,$PROJECT, $STORY);
-#    $stories = [ $story ];
+    my $iterations = all_iterations( $API,$PROJECT)->{iterations};
 
-    print _to_csv( @csv_fields ) , "\n";
-    foreach my $story (@$stories) {
-        #flatten labels
-        $story->{labels} = @{$story->{labels} || ['']}[0];
-        #map fields
-        $story->{current_state} = $current_state_map{$story->{current_state} || ''};
-        $story->{story_type}    = $story_map{$story->{story_type}            || ''};
-        $story->{requested_by}  = $user_map{$story->{requested_by}           || ''};
-        $story->{owned_by}      = $user_map{$story->{owned_by}               || ''};
-        my @data = @$story{@fields};
-        print _to_csv(@data), "\n";
+    foreach my $iteration (@$iterations)
+    {
+        my $target_version = sprintf( "rss-sprint-%i", $iteration->{number} );
+        #my $stories = all_stories($API, $PROJECT)->{stories};
+        #    my $story   = show_story( $API,$PROJECT, $STORY);
+        #    $stories = [ $story ];
+
+        my $stories = $iteration->{stories};
+        foreach my $story (@$stories) {
+
+            #flatten labels
+            $story->{target_version} = $target_version;
+            $story->{labels} = @{$story->{labels} || ['']}[0];
+            #map fields
+            $story->{current_state} = $current_state_map{$story->{current_state} || ''};
+            $story->{story_type}    = $story_map{$story->{story_type}            || ''};
+            $story->{requested_by}  = $user_map{$story->{requested_by}           || ''};
+            $story->{owned_by}      = $user_map{$story->{owned_by}               || ''};
+            my @data = @$story{@fields};
+            print _to_csv(@data), "\n";
+        }
     }
 }
