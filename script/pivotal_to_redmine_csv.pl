@@ -41,18 +41,21 @@ my @other_fields = qw(
 );
 
 my %field_name = (
-    accepted_at   => 'due date',
-    created_at    => 'start date',
-    current_state => 'status',
-    deadline      => 'deadline',
-    description   => 'description',
-    estimate      => 'story points',
-    id            => 'pivotal_id',
-    labels        => 'category',
-    name          => 'subject',
-    owned_by      => 'assigned_to',
-    requested_by  => 'author',
-    story_type    => 'tracker',
+    accepted_at    => 'due date',
+    created_at     => 'start date',
+    current_state  => 'status',
+    deadline       => 'deadline',
+    description    => 'description',
+    estimate       => 'story points',
+    id             => 'pivotal_id',
+    labels         => 'category',
+    name           => 'subject',
+    note           => 'Journal',
+    owned_by       => 'assigned_to',
+    parent         => 'Parent task',
+    requested_by   => 'author',
+    story_type     => 'tracker',
+    target_version => 'Target version',
 );
 my @fields = qw(
   id
@@ -69,6 +72,7 @@ my @fields = qw(
   deadline
   labels
   note
+  parent
 );
 
 my %story_map = (
@@ -114,6 +118,7 @@ print _to_csv( @csv_fields ) , "\n";
         foreach my $story (@$stories) {
 
             #flatten labels
+            $story->{parent}='';
             $story->{target_version} = $target_version;
             $story->{labels} = @{$story->{labels} || ['']}[0];
             #map fields
@@ -123,17 +128,42 @@ print _to_csv( @csv_fields ) , "\n";
             $story->{owned_by}      = $user_map{$story->{owned_by}               || ''};
             $story->{note}='';
             my @data = @$story{@fields};
-            print _to_csv(@data), "\n";
+            #print _to_csv(@data), "\n";
 
             foreach my $note (@{ $story->{notes}})
             {
-                print STDERR Dumper $note;
+                #print STDERR Dumper $note;
                 my $s;
                 $s->{id}     = $story->{id};
                 $s->{note}   = join("\n",$note->{date}, $note->{author},'',$note->{text});
                 $s->{requested_by} = $user_map{$note->{author}};
                 my @data = map {defined $_ ? $_ : ''} @$s{@fields};
+                #print _to_csv(@data), "\n";
+            }
+            foreach my $task (@{ $story->{tasks}})
+            {
+                #print STDERR Dumper $task if $task->{complete} ne 'false';
+                my $t = {
+                    parent         => $story->{id},
+                    target_version => $story->{target_version},
+                    requested_by   => $story->{requested_by},
+                    id             => $task->{id},
+                    name           => $task->{description},
+                    created_at     => $task->{date},
+                    story_type     => $story_map{'todo'},
+                };
+                $t->{description} = sprintf(
+                    "* pivotal story_id:  %s\n".
+                    "* pivotal task_id:   %s\n".
+                    "* pivotal story_url: http://www.pivotaltracker.com/story/show/%s\n",
+                    $t->{parent},
+                    $t->{id},
+                    $t->{parent},
+                );
+                $t->{current_state} = $task->{complete} eq 'true' ? 'Closed - Verified' : 'new';
+                my @data = map {defined $_ ? $_ : ''} @$t{@fields};
                 print _to_csv(@data), "\n";
+
             }
         }
     }
